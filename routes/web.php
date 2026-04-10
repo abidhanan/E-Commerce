@@ -25,3 +25,12 @@ Route::get('/product/{id}', function ($id) {
 
     return view('product-detail', compact('product'));
 })->name('product.show');
+
+// Tambahkan ini di routes/web.php
+Route::get('/seller/info', function () {
+    return view('seller-info');
+});
+
+Route::get('/seller/register', function () {
+    return view('auth.seller-register'); 
+});

@@ -12,26 +12,32 @@ class ProductSeeder extends Seeder
         $products = [
             [
                 'name' => 'Chesterfield Coat', 
-                'price' => 120.00, 
+                'price' => 499000, 
                 'image' => 'chanel-1.jpg', 
                 'rating' => 5
             ],
             [
                 'name' => 'Louis Vuitton', 
-                'price' => 85.00, 
+                'price' => 850000, 
                 'image' => '5.jpg', 
                 'rating' => 4
             ],
             [
                 'name' => 'Prada', 
-                'price' => 150.00, 
+                'price' => 150000, 
                 'image' => '3.jpg', 
                 'rating' => 5
             ],
             [
                 'name' => 'Versace', 
-                'price' => 210.00, 
+                'price' => 210000, 
                 'image' => '4.jpg', 
+                'rating' => 5
+            ],
+            [
+                'name' => 'Dior', 
+                'price' => 300000, 
+                'image' => 'chanel-2.png', 
                 'rating' => 5
             ],
         ];

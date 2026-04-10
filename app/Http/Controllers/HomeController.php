@@ -10,7 +10,7 @@ class HomeController extends Controller
     public function index()
     {
         // Menarik 4 data produk pertama dari Database
-        $trendingProducts = Product::take(4)->get();
+        $trendingProducts = Product::take(5)->get();
 
         return view('home', compact('trendingProducts'));
     }

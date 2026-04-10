@@ -6,7 +6,7 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto -mt-32 relative z-20 grid grid-cols-3 gap-6 px-6">
+    <div class="max-w-5xl mx-auto -mt-32 relative z-20 grid grid-cols-3 gap-6 px-6">
         @php
             // Ini adalah fondasi datamu.
             // Saat ini statis karena kategori utama jarang berubah. 
@@ -32,7 +32,7 @@
             <img src="{{ $cat['image'] }}" class="w-full h-[350px] object-cover group-hover:scale-105 transition duration-500" alt="{{ $cat['name'] }}">
             
             <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
-                <span class="bg-white px-6 py-1 text-[10px] font-bold tracking-tighter uppercase shadow-sm">{{ $cat['name'] }}</span>
+                <span class="bg-white px-6 py-1 text-[17px] font-bold tracking-tighter uppercase shadow-sm">{{ $cat['name'] }}</span>
             </div>
             
             <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition duration-300"></div>
