@@ -44,7 +44,7 @@
     <section class="max-w-screen-xl mx-auto px-6 pb-20">
         <h2 class="text-2xl font-bold mb-8 uppercase tracking-wide">Flash Sale</h2>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-1">
             @foreach($trendingProducts as $item)
                 <x-product-card :product="$item" />
             @endforeach
