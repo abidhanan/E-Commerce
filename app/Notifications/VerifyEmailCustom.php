@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Nontifications;
+namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail as BaseVerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;

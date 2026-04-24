@@ -2,57 +2,32 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('/', [HomeController::class, 'index']);
+Route::get('/login', [AuthController::class, 'ShowLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'Login']);
+Route::get('/register', [AuthController::class, 'ShowRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('DashboardAdmin');
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::prefix('admin')->group(function () {
 
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
+    Route::middleware('guest')->controller(AuthController::class)->group(function () {
+        // Route::get('/login', 'ShowLogin')->name('login');
+        // Route::post('/login', 'login');
+        // Route::get('/register', 'ShowRegister')->name('register');
+        // Route::post('/register', 'register');
+    });
 
-// Route untuk Halaman Detail Produk
-Route::get('/product/{id}', function ($id) {
-    
-    $product = \App\Models\Product::find($id);
-    
-    if (!$product) {
-        abort(404); 
-    }
+    Route::middleware(['auth', 'CheckRole:admin'])->group(function () {
 
-    return view('product-detail', compact('product'));
-})->name('product.show');
+        Route::controller(DashboardController::class)->group(function () {
+            Route::get('/dashboard', 'index')->name('dashboard');
+        });
 
-use App\Http\Controllers\AuthController;
-
-// Hanya bisa diakses oleh tamu (belum login)
-Route::middleware('guest')->group(function () {
-    // Rute Menampilkan UI
-    Route::get('/login', function () { return view('auth.login'); })->name('login');
-    Route::get('/register', function () { return view('auth.register'); })->name('register');
-    
-    // Rute Memproses Data Form (Mengarah ke AuthController)
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-});
-
-// Hanya bisa diakses oleh yang sudah login
-Route::middleware('auth')->group(function () {
-    // Rute Logout harus menggunakan POST demi keamanan (mencegah CSRF logout attack)
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-});
-
-Route::get('/catalog', function () {
-    return view('catalog');
-});
-
-Route::middleware('auth')->group(function () {
-    // Tambahkan baris ini
-    Route::get('/profile', function () {
-        return view('profile');
-    })->name('profile');
-    
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    });
 });
