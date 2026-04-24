@@ -23,7 +23,7 @@
             @endguest
 
             @auth
-                <a href="/dashboard" class="flex items-center space-x-2 px-5 py-2 rounded-full hover:bg-black hover:text-white transition-all duration-300">
+                <a href="{{ route('profile') }}" class="flex items-center space-x-2 px-5 py-2 rounded-full hover:bg-black hover:text-white transition-all duration-300">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
                     </svg>
@@ -68,7 +68,78 @@
 
         </div>
     </div>
-    <div class="flex justify-center space-x-12 py-2 text-xs font-bold uppercase tracking-widest border-t border-gray-100 hover:border-gray-300 transition">
-        <a href="#" class="hover:underline">Man</a><a href="#" class="hover:underline">Women</a><a href="#" class="hover:underline">Kids</a><a href="#" class="hover:underline">Baby</a>
+   <div class="relative w-full border-t border-gray-100">
+        <div class="flex justify-center space-x-12 py-4 text-xs font-bold uppercase tracking-widest">
+            
+            <div class="group static">
+                <a href="#" class="pb-4 hover:text-[#c4a052] border-b-2 border-transparent group-hover:border-[#c4a052] transition cursor-pointer">Man</a>
+                
+                <div class="absolute left-0 top-full w-full bg-gradient-to-b from-[#fdfbf6] to-white shadow-2xl border-t border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    
+                    <div class="max-w-screen-lg mx-auto px-6 py-12 grid grid-cols-4 gap-8 text-center">
+                        
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-black">Clothes</h3>
+                            <ul class="space-y-3 text-[13px] text-gray-600 font-normal capitalize">
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Shirt</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">T-shirt</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Pants</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Short Pants</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Jeans</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Outerwear</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-black">Accessories</h3>
+                            <ul class="space-y-3 text-[13px] text-gray-600 font-normal capitalize">
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Bag</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Watch</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Hat</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Glasses</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Belt</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-black">Shoes</h3>
+                            <ul class="space-y-3 text-[13px] text-gray-600 font-normal capitalize">
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Sandal</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Sneakers</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Sport</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Formal</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Slip On</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-widest mb-6 text-black">Brands</h3>
+                            <ul class="space-y-3 text-[13px] text-gray-600 font-normal capitalize">
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Chanel</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Christian Dior</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Armani</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Prada</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Louis Vuitton</a></li>
+                                <li><a href="#" class="hover:text-[#c4a052] hover:font-bold transition">Calvin Klein</a></li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="group">
+                <a href="#" class="pb-4 hover:text-[#c4a052] border-b-2 border-transparent hover:border-[#c4a052] transition cursor-pointer">Women</a>
+            </div>
+
+            <div class="group">
+                <a href="#" class="pb-4 hover:text-[#c4a052] border-b-2 border-transparent hover:border-[#c4a052] transition cursor-pointer">Kids</a>
+            </div>
+
+            <div class="group">
+                <a href="#" class="pb-4 hover:text-[#c4a052] border-b-2 border-transparent hover:border-[#c4a052] transition cursor-pointer">Baby</a>
+            </div>
+            
+        </div>
     </div>
 </nav>

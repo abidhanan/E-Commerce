@@ -1,5 +1,5 @@
 @props(['product'])
-<div class="bg-gray-50 p-2 group rounded-lg hover:shadow-lg transition relative cursor-pointer overflow-hidden">
+<div class="bg-gray-50 p-2 group rounded-lg hover:shadow-lg transition relative cursor-pointer overflow-hidden transition-all duration-300 ease-out hover:scale-101 hover:shadow-xl">
     <a href="{{ route('product.show', $product->id) }}" class="block">
         <div class="relative aspect-[3/4] bg-gray-200 mb-3 hover:-translate-y-1 transition all duration-300 rounded-lg">
             <img src="{{ asset('images/products/' . $product->image) }}" class="w-full h-full object-cover" alt="{{ $product->name }}">
@@ -9,7 +9,7 @@
         </div>
 
         <div class="px-1 relative pb-6"> 
-    
+
             <button type="button" onclick="showLoginModal(event)" class="absolute top-0 right-1 text-black-300 hover:text-red-500 transition focus:outline-none z-10">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
             </button>
@@ -24,8 +24,8 @@
             <p class="text-[13px] text-gray-500 line-clamp-2 my-1">Mantel Pendek Single Breasted Fit Rileks</p>
             
             <div class="mt-2 mb-2">
-                <span class="text-red-600 font-bold text-xl">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                <span class="text-gray-500 line-through font-italic text-[15px] block">Rp {{ number_format($product->price * 1.3, 0, ',', '.') }}</span>
+                <span class="text-black-600 font-bold text-[15px]">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                <span class="text-red-500 line-through font-italic text-[13px] block">Rp {{ number_format($product->price * 1.3, 0, ',', '.') }}</span>
             </div>
 
             <div class="absolute bottom-0 left-1 flex items-center text-[15px] font-bold text-gray-700">

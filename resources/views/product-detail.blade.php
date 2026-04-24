@@ -3,7 +3,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start relative">
     
             <div class="flex flex-col lg:col-span-7">
-                <div class="relative w-full bg-gray-100 overflow-hidden cursor-crosshair group aspect-[3/4] mb-4"
+                <div class="relative w-full max-w-[400px] mx-auto bg-gray-100 overflow-hidden cursor-crosshair group aspect-[3/4] mb-4"
                     id="main-image-container"
                     onmousemove="zoomImage(event, this)"
                     onmouseleave="resetZoom(this)">
