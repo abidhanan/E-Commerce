@@ -17,6 +17,10 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
+
+
 
 class AuthController extends Controller
 {
@@ -31,62 +35,49 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
-
+    
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'Email atau password salah'
             ]);
         }
-
+    
+       
         $request->session()->regenerate();
-
-        // ================= LOG LOGIN =================
-        // $agent = new Agent();
-
-        // ActivityLog::create([
-        //     'user_id'    => Auth::id(),
-        //     'event'      => 'login',
-        //     'ip_address' => $request->ip(),
-        //     'user_agent' => $request->userAgent(),
-        //     'device'     => $agent->device(),
-        //     'browser'    => $agent->browser(),
-        //     'platform'   => $agent->platform(),
-        // ]);
-
-        // ================= AUTO DELETE > 1 BULAN =================
-        ActivityLog::where('created_at', '<', now()->subMonth())->delete();
-
-        return redirect()->intended('/dashboard');
+    
+        $user = Auth::user();
+    
+     
+        if (!$user->hasVerifiedEmail()) {
+            Auth::logout();
+    
+            return redirect('/login')->withErrors([
+                'email' => 'Silakan verifikasi email terlebih dahulu.'
+            ]);
+        }
+    
+        // 🎯 redirect berdasarkan role
+        if ($user->hasRole('superadmin')) {
+            return redirect('/dashboard/superadmin');
+        }
+    
+        if ($user->hasRole('seller')) {
+            return redirect('/dashboard/seller');
+        }
+    
+        if ($user->hasRole('user')) {
+            return redirect('/dashboard/user');
+        }
+    
+        // fallback
+        return redirect('/');
     }
 
     public function showRegister()
 {
     return view('auth.register');
 }
-public function verifyEmail(Request $request, $id, $hash)
-{
-    $user = User::findOrFail($id);
 
-    // Validasi hash email
-    if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {
-        abort(403);
-    }
-
-    // Validasi signature URL
-    if (!URL::hasValidSignature($request)) {
-        abort(403);
-    }
-
-    if (!$user->hasVerifiedEmail()) {
-        $user->markEmailAsVerified();
-        event(new Verified($user));
-    }
-
-    Auth::login($user);
-
-    return redirect()->route('dashboard')
-        ->with('message', 'Email berhasil diverifikasi.');
-}
 public function register(Request $request)
 {
     $request->validate([
@@ -99,16 +90,57 @@ public function register(Request $request)
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        'role'=> 'superadmin',
     ]);
 
 
+    $user->assignRole('user'); 
 
-    $user->sendEmailVerificationNotification();
+    
+    $verificationUrl = URL::temporarySignedRoute(
+        'verification.verify',
+        Carbon::now()->addMinutes(60),
+        [
+            'id' => $user->id,
+            'hash' => sha1($user->email),
+        ]
+    );
+
+
+    Mail::send('Email.verify', [
+        'url' => $verificationUrl,
+        'user' => $user
+    ], function ($message) use ($user) {
+        $message->to($user->email)
+                ->subject('Verifikasi Email');
+    });
 
     return redirect('/login')->with('message', 'Silakan cek email untuk verifikasi.');
 }
+public function verifyEmail(Request $request, $id, $hash)
+{
+   $user = User::findOrFail($id);
 
+    // cek hash email
+    if (! hash_equals($hash, sha1($user->email))) {
+        abort(403, 'Link tidak valid');
+    }
+
+    // cek expired signature
+    if (! $request->hasValidSignature()) {
+        abort(403, 'Link expired / tidak valid');
+    }
+
+    // verifikasi email
+    if (! $user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+    }
+
+    Auth::login($user);
+
+    return redirect()->route('dashboard')
+        ->with('success', 'Email berhasil diverifikasi');
+
+}
 
     public function logout(Request $request)
     {

@@ -12,11 +12,9 @@ class UserSeeder extends Seeder
     {
         $data = [
             ['Super Admin','superadmin@toko.com','superadmin'],
-            ['Admin','admin@toko.com','admin'],
-            ['Editor','editor@toko.com','editor'],
-            ['Finance','finance@toko.com','finance'],
-            ['Staff','staff@toko.com','staff'],
+            ['Seller','seller@toko.com','seller'],
             ['Customer','customer@toko.com','user'],
+            ['Guest','guest@toko.com','guest'],
         ];
 
         foreach ($data as $u) {
