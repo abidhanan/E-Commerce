@@ -7,16 +7,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
-use App\Models\ActivityLog;
-use Illuminate\Support\Facades\DB;
-use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
@@ -56,9 +50,12 @@ class AuthController extends Controller
             ]);
         }
     
-        // 🎯 redirect berdasarkan role
         if ($user->hasRole('superadmin')) {
             return redirect('/dashboard/superadmin');
+        }
+
+        if ($user->hasRole('admin')) {
+            return redirect('/dashboard/admin');
         }
     
         if ($user->hasRole('seller')) {
@@ -120,24 +117,21 @@ public function verifyEmail(Request $request, $id, $hash)
 {
    $user = User::findOrFail($id);
 
-    // cek hash email
     if (! hash_equals($hash, sha1($user->email))) {
         abort(403, 'Link tidak valid');
     }
 
-    // cek expired signature
     if (! $request->hasValidSignature()) {
         abort(403, 'Link expired / tidak valid');
     }
 
-    // verifikasi email
     if (! $user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
     }
 
     Auth::login($user);
 
-    return redirect()->route('dashboard')
+    return redirect()->route('landingpage')
         ->with('success', 'Email berhasil diverifikasi');
 
 }

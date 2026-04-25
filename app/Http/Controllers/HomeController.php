@@ -12,6 +12,6 @@ class HomeController extends Controller
         // Menarik 4 data produk pertama dari Database
         $trendingProducts = Product::take(5)->get();
 
-        return view('home', compact('trendingProducts'));
+        return view('User.home', compact('trendingProducts'));
     }
 }
