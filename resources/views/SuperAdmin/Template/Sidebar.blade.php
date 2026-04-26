@@ -85,5 +85,43 @@
                 </ul>
             </div>
         </li>
+        {{-- =================== Collection ================== --}}
+        <li class="nav-item">
+
+            <a class="nav-link d-flex justify-content-between align-items-center 
+    {{ request()->routeIs('superadmin.collections.*') ? '' : 'collapsed' }}"
+                data-bs-toggle="collapse" data-bs-target="#collectionMenu">
+
+                <span>
+                    <i class="bi bi-people"></i>
+                    <span class="menu-text">Collections</span>
+                </span>
+
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+
+            <div class="collapse {{ request()->routeIs('superadmin.collections.*') ? 'show' : '' }}" id="collectionMenu">
+
+                <ul class="nav flex-column ms-4 mt-2">
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('superadmin.collections.index') ? 'active' : '' }}"
+                            href="{{ route('superadmin.collections.index') }}">
+                            <i class="bi bi-list"></i>
+                            <span class="menu-text">All Collections</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('superadmin.collections.create') ? 'active' : '' }}"
+                            href="{{ route('superadmin.collections.create') }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span class="menu-text">Add Collection</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </li>
     </ul>
 </div>

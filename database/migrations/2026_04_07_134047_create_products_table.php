@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('category_id')
+                  ->constrained()
+                  ->cascadeOnDelete();
+            $table->foreignId('collection_id')
+                  ->nullable();
             $table->unsignedBigInteger('price');
             $table->string('image'); // URL gambar
             $table->integer('rating')->default(0);

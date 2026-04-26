@@ -11,18 +11,18 @@ class CollectionSeeder extends Seeder
     {
         $collections = [
             [
-                'name' => 'Alpine Core',
-                'slug' => 'alpine-core',
+                'name' => 'Lebaran',
+                'slug' => 'lebaran',
                 'img' => 'collections/collection-placeholder.svg',
             ],
             [
-                'name' => 'Trail Motion',
-                'slug' => 'trail-motion',
+                'name' => 'Winter Essentials',
+                'slug' => 'winter-essentials',
                 'img' => 'collections/collection-placeholder.svg',
             ],
             [
-                'name' => 'City Commute',
-                'slug' => 'city-commute',
+                'name' => 'Summer Vibes',
+                'slug' => 'summer-vibes',
                 'img' => 'collections/collection-placeholder.svg',
             ],
         ];

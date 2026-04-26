@@ -7,6 +7,7 @@ use App\Http\Controllers\MainController\ProfileController;
 use App\Http\Controllers\MainController\HomeController ;
 use App\Http\Controllers\UserController\UserController;
 use App\Http\Controllers\ProductController\CategoryController;
+use App\Http\Controllers\ProductController\CollectionsController;
 
 Route::get('/', [HomeController::class, 'index'])->middleware('guest');
 Route::get('/login', [AuthController::class, 'ShowLogin'])->name('login');
@@ -81,6 +82,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
             Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
             Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+            Route::get('/collections', [CollectionsController::class, 'index'])->name('collections.index');
+            Route::get('/collections/create', [CollectionsController::class, 'create'])->name('collections.create');
+            Route::post('/collections', [CollectionsController::class, 'store'])->name('collections.store');
+            Route::get('/collections/{collection}/edit', [CollectionsController::class, 'edit'])->name('collections.edit');
+            Route::put('/collections/{collection}', [CollectionsController::class, 'update'])->name('collections.update');
+            Route::delete('/collections/{collection}', [CollectionsController::class, 'destroy'])->name('collections.destroy');
+
     });
 });
 
