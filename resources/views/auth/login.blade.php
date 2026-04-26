@@ -23,9 +23,13 @@
         </div>
     @endif
 
+    <a href="{{ url('/password/reset') }}" class="d-block text-center mt-3">
+        Lupa password?
+    </a>
     <a href="{{ url('/admin/register') }}" class="d-block text-center mt-3">
         Belum punya akun? Register
     </a>
     <a href="{{ route('register') }}" class="d-block text-center mt-3">
         Belum punya akun? Register
     </a>
+

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\MainController;
 
-use Illuminate\Http\Request;
-use App\Models\Product; // Wajib import Model Product
+use App\Models\Product; 
+use App\Http\Controllers\Controller;
 
 class HomeController extends Controller
 {

@@ -63,7 +63,7 @@ class AuthController extends Controller
         }
     
         if ($user->hasRole('user')) {
-            return redirect('/dashboard/user');
+            return redirect('/landingpage');
         }
     
         // fallback
@@ -157,11 +157,10 @@ public function verifyEmail(Request $request, $id, $hash)
         if ($request->user()->hasVerifiedEmail()) {
             return redirect('/dashboard');
         }
-
         $request->user()->sendEmailVerificationNotification();
-
         return back()->with('status', 'verification-link-sent');
     }
+
     public function showForgotPassword()
 {
     return view('auth.forgot-password');
