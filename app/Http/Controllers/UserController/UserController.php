@@ -32,13 +32,13 @@ class UserController extends Controller
         return view('Admin.Users.partials.user_table', compact('users'))->render();
     }
 
-    return view('Admin.Users.index', compact('users'));
+    return view('SuperAdmin.Users.index', compact('users'));
 }
 
     public function create()
     {
         $roles = Role::all();
-        return view('Admin.Users.create', compact('roles'));
+        return view('SuperAdmin.Users.create', compact('roles'));
     }
 
     public function loglogin(Request $request)
@@ -69,10 +69,10 @@ class UserController extends Controller
             $logs = $query->latest()->get();
 
             if ($request->ajax()) {
-                return view('Admin.Users.partials.log_table', compact('logs'))->render();
+                return view('SuperAdmin.Users.partials.log_table', compact('logs'))->render();
             }
 
-            return view('Admin.Users.log_login', compact('logs'));
+            return view('SuperAdmin.Users.log_login', compact('logs'));
         }
     public function store(Request $request)
     {
@@ -92,13 +92,13 @@ class UserController extends Controller
 
         $user->assignRole($request->role);
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('SuperAdmin.Users.index');
     }
 
     public function edit(User $user)
     {
         $roles = Role::all();
-        return view('Admin.Users.edit', compact('user', 'roles'));
+        return view('SuperAdmin.Users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
@@ -122,7 +122,7 @@ class UserController extends Controller
 
         $user->syncRoles([$request->role]);
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('SuperAdmin.Users.index');
     }
 
     public function destroy(User $user)
@@ -133,6 +133,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('SuperAdmin.Users.index');
     }
 }

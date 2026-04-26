@@ -12,6 +12,7 @@ class UserSeeder extends Seeder
     {
         $data = [
             ['Super Admin','superadmin@toko.com','superadmin'],
+            ['Admin', 'admin@toko.com', 'admin'],
             ['Seller','seller@toko.com','seller'],
             ['Customer','customer@toko.com','user'],
             ['Guest','guest@toko.com','guest'],

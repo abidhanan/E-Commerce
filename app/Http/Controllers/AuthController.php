@@ -51,7 +51,7 @@ class AuthController extends Controller
         }
     
         if ($user->hasRole('superadmin')) {
-            return redirect('/dashboard/superadmin');
+            return redirect()->route('dashboard');
         }
 
         if ($user->hasRole('admin')) {
