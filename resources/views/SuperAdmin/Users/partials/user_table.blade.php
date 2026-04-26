@@ -20,11 +20,11 @@
 
         <td>
             <div class="d-flex gap-2">
-                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-outline-primary btn-sm">
+                <a href="{{ route('superadmin.users.edit', $user->id) }}" class="btn btn-outline-primary btn-sm">
                     Edit
                 </a>
 
-                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST"
+                <form action="{{ route('superadmin.users.destroy', $user->id) }}" method="POST"
                     onsubmit="return confirm('Hapus user?')">
                     @csrf
                     @method('DELETE')

@@ -7,7 +7,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-semibold mb-0">User Management</h4>
-            <a href="{{ route('SuperAdmin.Users.create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('superadmin.users.create') }}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus"></i> Tambah User
             </a>
         </div>
@@ -31,7 +31,7 @@
                             </tr>
                         </thead>
                         <tbody id="userTable">
-                            @include('Admin.Users.partials.user_table')
+                            @include('SuperAdmin.Users.partials.user_table')
                         </tbody>
                     </table>
                 </div>
@@ -48,7 +48,7 @@
 
             let value = this.value;
 
-            fetch("{{ route('admin.users.index') }}?search=" + value, {
+            fetch("{{ route('superadmin.users.index') }}?search=" + value, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }

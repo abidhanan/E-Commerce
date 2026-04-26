@@ -1,4 +1,4 @@
-@extends('Admin.Template.index')
+@extends('SuperAdmin.Template.index')
 
 @section('title', 'Tambah User')
 
@@ -9,7 +9,7 @@
 
                 <h5 class="mb-4 fw-semibold">Tambah User</h5>
 
-                <form method="POST" action="{{ route('admin.users.store') }}">
+                <form method="POST" action="{{ route('superadmin.users.store') }}">
                     @csrf
 
                     <div class="mb-3">
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-secondary">
                             Kembali
                         </a>
 

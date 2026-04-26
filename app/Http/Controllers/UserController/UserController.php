@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\UsersController;
+namespace App\Http\Controllers\UserController;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class UserController extends Controller
     $users = $query->get();
 
     if ($request->ajax()) {
-        return view('Admin.Users.partials.user_table', compact('users'))->render();
+        return view('SuperAdmin.Users.partials.user_table', compact('users'))->render();
     }
 
     return view('SuperAdmin.Users.index', compact('users'));
@@ -92,7 +92,7 @@ class UserController extends Controller
 
         $user->assignRole($request->role);
 
-        return redirect()->route('SuperAdmin.Users.index');
+        return redirect()->route('superadmin.users.index');
     }
 
     public function edit(User $user)
@@ -122,7 +122,7 @@ class UserController extends Controller
 
         $user->syncRoles([$request->role]);
 
-        return redirect()->route('SuperAdmin.Users.index');
+        return redirect()->route('superadmin.users.index');
     }
 
     public function destroy(User $user)
@@ -133,6 +133,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('SuperAdmin.Users.index');
+        return redirect()->route('superadmin.users.index');
     }
 }
