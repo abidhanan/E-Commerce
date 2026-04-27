@@ -59,4 +59,6 @@
     </table>
 </div>
 
-{{ $collections->links() }}
+<div class="d-flex justify-content-end mt-3">
+    {{ $collections->links('pagination::bootstrap-5') }}
+</div>

@@ -19,7 +19,7 @@ class CategoryController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $categories = $query->paginate(10);
+        $categories = $query->paginate(10)->withQueryString();
 
         if ($request->ajax()) {
             return view('Superadmin.Categories.partials.table', compact('categories'))->render();

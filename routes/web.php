@@ -8,6 +8,10 @@ use App\Http\Controllers\MainController\HomeController ;
 use App\Http\Controllers\UserController\UserController;
 use App\Http\Controllers\ProductController\CategoryController;
 use App\Http\Controllers\ProductController\CollectionsController;
+use App\Http\Controllers\BlogController\BlogController;
+use App\Http\Controllers\BlogController\BlogCategoryController;
+use App\Http\Controllers\BlogController\TagController;
+
 
 Route::get('/', [HomeController::class, 'index'])->middleware('guest');
 Route::get('/login', [AuthController::class, 'ShowLogin'])->name('login');
@@ -88,6 +92,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/collections/{collection}/edit', [CollectionsController::class, 'edit'])->name('collections.edit');
             Route::put('/collections/{collection}', [CollectionsController::class, 'update'])->name('collections.update');
             Route::delete('/collections/{collection}', [CollectionsController::class, 'destroy'])->name('collections.destroy');
+
+            Route::resource('blog-categories', BlogCategoryController::class);
+            Route::resource('tags', TagController::class);
+            Route::resource('blogs', BlogController::class);
+            Route::get('blogs/{blog}/publish', [BlogController::class, 'relaseblog'])->name('blogs.publish');
 
     });
 });

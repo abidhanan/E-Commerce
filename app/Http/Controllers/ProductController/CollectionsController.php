@@ -18,7 +18,7 @@ class CollectionsController extends Controller
         $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $collections = $query->latest()->paginate(10);
+    $collections = $query->latest()->paginate(10)->withQueryString();
 
     if ($request->ajax()) {
         return view('superadmin.collections.partials.table', compact('collections'))->render();

@@ -123,5 +123,150 @@
                 </ul>
             </div>
         </li>
+        {{-- ================= BLOG ================= --}}
+        <li class="nav-item">
+
+            <a class="nav-link d-flex justify-content-between align-items-center 
+            {{ request()->routeIs('superadmin.blogs.*') || request()->routeIs('superadmin.blog-categories.*') || request()->routeIs('superadmin.tags.*') ? '' : 'collapsed' }}"
+                data-bs-toggle="collapse" data-bs-target="#blogMenu">
+
+                <span>
+                    <i class="bi bi-journal"></i>
+                    <span class="menu-text">Blog</span>
+                </span>
+
+                <i class="bi bi-chevron-down small"></i>
+            </a>
+
+            <div class="collapse 
+            {{ request()->routeIs('superadmin.blogs.*') || request()->routeIs('superadmin.blog-categories.*') || request()->routeIs('superadmin.tags.*') ? 'show' : '' }}"
+                id="blogMenu">
+
+                <ul class="nav flex-column ms-4 mt-2">
+
+                    {{-- BLOGS --}}
+                    <li class="nav-item">
+
+                        <a class="nav-link d-flex justify-content-between align-items-center 
+                        {{ request()->routeIs('superadmin.blogs.*') ? '' : 'collapsed' }}"
+                            data-bs-toggle="collapse" data-bs-target="#blogsSubMenu">
+
+                            <span>
+                                <i class="bi bi-file-text"></i>
+                                <span class="menu-text">Blogs</span>
+                            </span>
+
+                            <i class="bi bi-chevron-down small"></i>
+                        </a>
+
+                        <div class="collapse {{ request()->routeIs('superadmin.blogs.*') ? 'show' : '' }}"
+                            id="blogsSubMenu">
+
+                            <ul class="nav flex-column ms-4 mt-2">
+
+                                <li class="nav-item nav-sub-item">
+                                    <a class="nav-link {{ request()->routeIs('superadmin.blogs.index') ? 'active' : '' }}"
+                                        href="{{ route('superadmin.blogs.index') }}">
+                                        <i class="bi bi-list"></i>
+                                        <span class="menu-text">All Blogs</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item nav-sub-item">
+                                    <a class="nav-link {{ request()->routeIs('superadmin.blogs.create') ? 'active' : '' }}"
+                                        href="{{ route('superadmin.blogs.create') }}">
+                                        <i class="bi bi-plus-circle"></i>
+                                        <span class="menu-text">Add Blog</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
+
+                    {{-- BLOG CATEGORIES --}}
+                    <li class="nav-item">
+
+                        <a class="nav-link d-flex justify-content-between align-items-center 
+                        {{ request()->routeIs('superadmin.blog-categories.*') ? '' : 'collapsed' }}"
+                            data-bs-toggle="collapse" data-bs-target="#blogCategoryMenu">
+
+                            <span>
+                                <i class="bi bi-tags"></i>
+                                <span class="menu-text">Categories</span>
+                            </span>
+
+                            <i class="bi bi-chevron-down small"></i>
+                        </a>
+
+                        <div class="collapse {{ request()->routeIs('superadmin.blog-categories.*') ? 'show' : '' }}"
+                            id="blogCategoryMenu">
+
+                            <ul class="nav flex-column ms-4 mt-2">
+
+                                <li class="nav-item nav-sub-item">
+                                    <a class="nav-link {{ request()->routeIs('superadmin.blog-categories.index') ? 'active' : '' }}"
+                                        href="{{ route('superadmin.blog-categories.index') }}">
+                                        <i class="bi bi-list"></i>
+                                        <span class="menu-text">All Categories</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item nav-sub-item">
+                                    <a class="nav-link {{ request()->routeIs('superadmin.blog-categories.create') ? 'active' : '' }}"
+                                        href="{{ route('superadmin.blog-categories.create') }}">
+                                        <i class="bi bi-plus-circle"></i>
+                                        <span class="menu-text">Add Category</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
+
+                    {{-- TAGS --}}
+                    <li class="nav-item">
+
+                        <a class="nav-link d-flex justify-content-between align-items-center 
+                        {{ request()->routeIs('superadmin.tags.*') ? '' : 'collapsed' }}"
+                            data-bs-toggle="collapse" data-bs-target="#tagsMenu">
+
+                            <span>
+                                <i class="bi bi-tag"></i>
+                                <span class="menu-text">Tags</span>
+                            </span>
+
+                            <i class="bi bi-chevron-down small"></i>
+                        </a>
+
+                        <div class="collapse {{ request()->routeIs('superadmin.tags.*') ? 'show' : '' }}" id="tagsMenu">
+
+                            <ul class="nav flex-column ms-4 mt-2">
+
+                                <li class="nav-item nav-sub-item">
+                                    <a class="nav-link {{ request()->routeIs('superadmin.tags.index') ? 'active' : '' }}"
+                                        href="{{ route('superadmin.tags.index') }}">
+                                        <i class="bi bi-list"></i>
+                                        <span class="menu-text">All Tags</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item nav-sub-item">
+                                    <a class="nav-link {{ request()->routeIs('superadmin.tags.create') ? 'active' : '' }}"
+                                        href="{{ route('superadmin.tags.create') }}">
+                                        <i class="bi bi-plus-circle"></i>
+                                        <span class="menu-text">Add Tag</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+
+        </li>
+
     </ul>
 </div>

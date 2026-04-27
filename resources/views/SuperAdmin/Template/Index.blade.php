@@ -198,6 +198,36 @@
             background: var(--primary);
             color: #fff;
         }
+
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        .page-link {
+            color: var(--primary);
+            border-radius: 8px;
+            margin: 0 2px;
+            border-color: var(--border);
+            box-shadow: none !important;
+        }
+
+        .page-link:hover {
+            color: var(--primary-light);
+            background: #f3f4f6;
+            border-color: var(--border);
+        }
+
+        .page-item.active .page-link {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .page-item.disabled .page-link {
+            color: var(--text-muted);
+            background: #fff;
+            border-color: var(--border);
+        }
     </style>
 
     @stack('styles')
@@ -212,10 +242,10 @@
     </div>
 
     <div class="d-flex">
-        @include('SuperAdmin.Template.sidebar')
+        @include('SuperAdmin.Template.Sidebar')
 
         <div class="flex-grow-1">
-            @include('SuperAdmin.Template.header')
+            @include('SuperAdmin.Template.Header')
 
             <div class="container-fluid py-4">
                 @if ($errors->any())
@@ -230,7 +260,7 @@
                 @yield('content')
             </div>
 
-            @include('SuperAdmin.Template.footer')
+            @include('SuperAdmin.Template.Footer')
         </div>
     </div>
 

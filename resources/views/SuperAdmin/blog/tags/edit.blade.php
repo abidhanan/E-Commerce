@@ -1,0 +1,47 @@
+@extends('SuperAdmin.Template.Index')
+
+@section('title', 'Edit Tag')
+
+@section('content')
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Edit Tag</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form action="{{ route('superadmin.tags.update', $tag) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                {{-- NAME --}}
+                <div class="mb-3">
+                    <label class="form-label">Tag Name</label>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                        value="{{ old('name', $tag->name) }}" required>
+
+                    @error('name')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                {{-- BUTTON --}}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Update
+                    </button>
+
+                    <a href="{{ route('superadmin.tags.index') }}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+@endsection
