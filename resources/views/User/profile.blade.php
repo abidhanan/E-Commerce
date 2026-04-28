@@ -22,7 +22,7 @@
                     <li class="pt-4">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="hover:text-red-600 transition text-left w-full">Logout</button>
+                            <button type="submit" class="border border-black-600 px-8 py-1 hover:bg-red-600 hover:text-white transition text-left text-md font-bold rounded-xl">Logout</button>
                         </form>
                     </li>
                 </ul>
