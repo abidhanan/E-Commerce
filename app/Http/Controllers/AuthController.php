@@ -43,6 +43,7 @@ class AuthController extends Controller
     
      
         if (!$user->hasVerifiedEmail()) {
+            // Jangan di-logout! Biarkan masuk tapi lemparkan ke ruang isolasi (verify notice)
             return redirect()->route('verification.notice');
         }
     

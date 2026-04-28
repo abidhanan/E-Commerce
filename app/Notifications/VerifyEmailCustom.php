@@ -13,6 +13,8 @@ class VerifyEmailCustom extends BaseVerifyEmail
 
         return (new MailMessage)
             ->subject('Verify Your Email - Clothique')
+            // 1. Arahkan ke template EMAIL yang benar
+            // 2. Samakan nama variabel menjadi 'url'
             ->view('Email.verify', [
                 'url' => $verificationUrl, 
                 'name' => $notifiable->name,
