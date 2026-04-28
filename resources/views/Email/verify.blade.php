@@ -2,51 +2,54 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Verify Email</title>
+    <title>Verify Email - Clothique</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f4f4; font-family:Arial, sans-serif;">
+<body style="margin:0; padding:0; background-color:#fafafa; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">
 
-    <table width="100%" bgcolor="#f4f4f4" cellpadding="0" cellspacing="0">
+    <table width="100%" bgcolor="#fafafa" cellpadding="0" cellspacing="0" border="0">
         <tr>
-            <td align="center">
+            <td align="center" style="padding: 60px 20px;">
 
-                <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; margin-top:40px; border-radius:10px; overflow:hidden;">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border: 1px solid #e5e5e5;">
                     
-                    <!-- HEADER -->
                     <tr>
-                        <td style="background:#4f46e5; padding:20px; text-align:center; color:white;">
-                            <h2 style="margin:0;">E-Commerce App</h2>
+                        <td align="center" style="padding: 50px 20px 20px 20px;">
+                            <h1 style="margin:0; font-size:32px; font-weight:normal; letter-spacing:6px; text-transform:uppercase; color:#000000;">
+                                Clothique
+                            </h1>
+                            <div style="height:2px; width:40px; background-color:#000000; margin: 25px auto 0 auto;"></div>
                         </td>
                     </tr>
 
-                    <!-- BODY -->
                     <tr>
-                        <td style="padding:30px; color:#333;">
+                        <td style="padding: 30px 50px 50px 50px; text-align:center;">
                             
-                            <h3>Halo 👋</h3>
+                            <h2 style="margin:0 0 20px 0; font-size:16px; font-weight:bold; letter-spacing:3px; text-transform:uppercase; color:#000000;">
+                                Verify Your Email
+                            </h2>
 
-                            <p>Terima kasih sudah mendaftar di aplikasi kami.</p>
+                            <p style="margin:0 0 30px 0; font-size:14px; line-height:1.8; color:#555555; font-weight:300;">
+                                Welcome to the exclusive world of Clothique. To ensure the security of your account and begin your journey with us, please verify your email address by clicking the button below.
+                            </p>
 
-                            <p>Silakan klik tombol di bawah ini untuk memverifikasi email kamu:</p>
-
-                            <!-- BUTTON -->
-                            <div style="text-align:center; margin:30px 0;">
+                            <div style="margin: 40px 0;">
                                 <a href="{{ $url }}" 
-                                   style="background:#4f46e5; color:white; padding:12px 25px; text-decoration:none; border-radius:6px; display:inline-block;">
-                                     Verifikasi Email
+                                   style="background-color:#000000; color:#ffffff; padding:18px 36px; font-size:12px; font-weight:bold; letter-spacing:3px; text-transform:uppercase; text-decoration:none; display:inline-block;">
+                                    Verify Email
                                 </a>
                             </div> 
 
-                            <p>Jika kamu tidak merasa mendaftar, abaikan email ini.</p>
-
-                            <p>Terima kasih,<br><strong>Tim E-Commerce</strong></p>
+                            <p style="margin:0 0 10px 0; font-size:12px; color:#999999; line-height:1.5;">
+                                If you did not create an account with Clothique, please ignore this email. No further action is required.
+                            </p>
                         </td>
                     </tr>
 
-                    <!-- FOOTER -->
                     <tr>
-                        <td style="background:#f4f4f4; padding:15px; text-align:center; font-size:12px; color:#777;">
-                            © {{ date('Y') }} E-Commerce App. All rights reserved.
+                        <td style="background-color:#000000; padding:40px 20px; text-align:center;">
+                            <p style="margin:0; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#888888;">
+                                © {{ date('Y') }} Clothique. All rights reserved.
+                            </p>
                         </td>
                     </tr>
 

@@ -43,11 +43,8 @@ class AuthController extends Controller
     
      
         if (!$user->hasVerifiedEmail()) {
-            Auth::logout();
-    
-            return redirect('/login')->withErrors([
-                'email' => 'Silakan verifikasi email terlebih dahulu.'
-            ]);
+            // Jangan di-logout! Biarkan masuk tapi lemparkan ke ruang isolasi (verify notice)
+            return redirect()->route('verification.notice');
         }
     
         if ($user->hasRole('superadmin')) {
@@ -89,29 +86,11 @@ public function register(Request $request)
         'password' => Hash::make($request->password),
     ]);
 
-
     $user->assignRole('user'); 
 
-    
-    $verificationUrl = URL::temporarySignedRoute(
-        'verification.verify',
-        Carbon::now()->addMinutes(60),
-        [
-            'id' => $user->id,
-            'hash' => sha1($user->email),
-        ]
-    );
+    $user->sendEmailVerificationNotification(); 
 
-
-    Mail::send('Email.verify', [
-        'url' => $verificationUrl,
-        'user' => $user
-    ], function ($message) use ($user) {
-        $message->to($user->email)
-                ->subject('Verifikasi Email');
-    });
-
-    return redirect('/login')->with('message', 'Silakan cek email untuk verifikasi.');
+    return redirect('/login')->with('success', 'Registrasi berhasil! Silakan cek kotak masuk email Anda untuk verifikasi.');
 }
 public function verifyEmail(Request $request, $id, $hash)
 {
@@ -147,7 +126,7 @@ public function verifyEmail(Request $request, $id, $hash)
     public function showVerify()
     {
         if (Auth::user()->hasVerifiedEmail()) {
-            return redirect('/dashboard');
+            return redirect('/'); // Lempar ke jalan utama, biarkan sistem yang memilah nanti
         }
         return view('auth.verify');
     }
@@ -155,7 +134,7 @@ public function verifyEmail(Request $request, $id, $hash)
     public function resendVerification(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect('/dashboard');
+            return redirect('/');
         }
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
