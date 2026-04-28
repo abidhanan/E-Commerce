@@ -5,6 +5,18 @@
             <h2 class="text-3xl font-normal tracking-wide mb-2 uppercase text-center">Login</h2>
             <div class="w-16 h-1 bg-black mx-auto mb-10"></div>
 
+            @if (session('success'))
+                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-4 mb-6 flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 mt-0.5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-bold tracking-wide uppercase mb-1">Berhasil!</h4>
+                        <p class="text-xs font-medium">{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                     <p class="text-xs text-red-700 font-semibold">{{ $errors->first() }}</p>

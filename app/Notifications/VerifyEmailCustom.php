@@ -12,9 +12,9 @@ class VerifyEmailCustom extends BaseVerifyEmail
         $verificationUrl = $this->verificationUrl($notifiable);
 
         return (new MailMessage)
-            ->subject('Verifikasi Email Anda')
+            ->subject('Verify Your Email - Clothique')
             ->view('Email.verify', [
-                'verifyUrl' => $verificationUrl,
+                'url' => $verificationUrl, 
                 'name' => $notifiable->name,
             ]);
     }

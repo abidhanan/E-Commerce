@@ -111,7 +111,6 @@
                 });
             }
 
-            // 3. Jalankan fungsi render (Di dunia nyata, ini dipanggil setelah fetch() sukses)
             renderStore();
         });
     </script>
