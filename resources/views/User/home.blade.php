@@ -2,52 +2,99 @@
     
     <x-hero-banner />
 
-    <section class="py-12 border-y border-gray-100 overflow-hidden bg-white">
-        <div class="text-center mb-8">
-            <span class="bg-black text-white px-10 py-2 text-sm font-bold uppercase tracking-[0.3em]">Our Brand</span>
-        </div>
-
-        @php
-            $brands = [
-                ['name' => 'Chanel', 'img' => 'https://upload.wikimedia.org/wikipedia/en/thumb/9/92/Chanel_logo_interlocking_cs.svg/1280px-Chanel_logo_interlocking_cs.svg.png', 'class' => 'h-16 md:h-20'],
-                ['name' => 'LV', 'img' => 'https://upload.wikimedia.org/wikipedia/commons/7/76/Louis_Vuitton_logo_and_wordmark.svg', 'class' => 'h-16 md:h-20'],
-                ['name' => 'Zara', 'img' => 'https://upload.wikimedia.org/wikipedia/commons/f/fd/Zara_Logo.svg', 'class' => 'h-12 md:h-16'],
-                ['name' => 'Prada', 'img' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Prada-Logo.svg/1280px-Prada-Logo.svg.png', 'class' => 'h-10 md:h-11'],
-                ['name' => 'Versace', 'img' => 'https://www.svgrepo.com/show/303462/versace-medusa-2-logo.svg', 'class' => 'h-16 md:h-22'],
-                ['name' => 'Hermes', 'img' => 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e4/Herm%C3%A8s.svg/250px-Herm%C3%A8s.svg.png', 'class' => 'h-16 md:h-20'],
-                ['name' => 'Dior', 'img' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Dior_Logo_2022.svg/3840px-Dior_Logo_2022.svg.png', 'class' => 'h-16 md:h-12'],
-                ['name' => 'Sephora', 'img' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Sephora_logo.svg/1280px-Sephora_logo.svg.png', 'class' => 'h-16 md:h-7'],
-                ['name' => 'Celine', 'img' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Celine_logo.svg/1280px-Celine_logo.svg.png', 'class' => 'h-16 md:h-7'],
-            ];
-        @endphp
-
-        <div class="flex overflow-hidden group">
-            <div class="flex gap-24 pr-24 animate-infinite-scroll items-center shrink-0 group-hover:[animation-play-state:paused]">
-                @for ($i = 0; $i < 4; $i++)
-                    @foreach($brands as $brand)
-                        <img src="{{ $brand['img'] }}" class="{{ $brand['class'] }} w-auto object-contain shrink-0 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition duration-300" alt="{{ $brand['name'] }}">
-                    @endforeach
-                @endfor
-            </div>
-
-            <div class="flex gap-24 pr-24 animate-infinite-scroll items-center shrink-0 group-hover:[animation-play-state:paused]" aria-hidden="true">
-                @for ($i = 0; $i < 4; $i++)
-                    @foreach($brands as $brand)
-                        <img src="{{ $brand['img'] }}" class="{{ $brand['class'] }} w-auto object-contain shrink-0 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition duration-300" alt="{{ $brand['name'] }}">
-                    @endforeach
-                @endfor
-            </div>
-
+    <section class="mt-16 w-full relative h-[300px] md:h-[450px]">
+        <img src="{{ asset('images/image 45.png') }}" class="w-full h-full object-cover" alt="Clothique x Sabrina">
+        <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <h2 class="text-white text-3xl md:text-5xl font-serif tracking-widest text-center px-4 drop-shadow-lg">Clothique x Sabrina Carpenter</h2>
         </div>
     </section>
 
-    <section class="max-w-screen-xl mx-auto px-6 pb-20">
-        <h2 class="text-2xl font-bold mb-8 uppercase tracking-wide">Flash Sale</h2>
+    <section class="max-w-screen-xl mx-auto px-6 py-16">
+        <h2 class="text-xl font-bold mb-8 uppercase tracking-wide">Flash Sale</h2>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-1">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             @foreach($trendingProducts as $item)
                 <x-product-card :product="$item" />
             @endforeach
+        </div>
+    </section>
+
+    <section class="w-full relative h-[400px] flex">
+        <div class="w-1/3 h-full hidden md:block">
+            <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Bag">
+        </div>
+        <div class="w-full md:w-1/3 h-full">
+            <img src="https://images.unsplash.com/photo-1559563458-527698bf5295?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Belt">
+        </div>
+        <div class="w-1/3 h-full hidden md:block">
+            <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover" alt="Watch">
+        </div>
+        
+        <div class="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+            <h2 class="text-white text-3xl md:text-5xl font-serif tracking-widest text-center px-4 drop-shadow-xl">Clothique Accessories Collection</h2>
+        </div>
+    </section>
+
+    <section class="max-w-screen-xl mx-auto px-6 py-20 md:grid-cols-4">
+        <h2 class="text-xl font-bold mb-10 uppercase tracking-wide">Category</h2>
+        
+        @php
+            $categories = [
+                ['name' => 'SHIRTS', 'img' => asset('images/category/shirt.png')],
+                ['name' => 'PANTS', 'img' => asset('images/category/pants.png')],
+                ['name' => 'SKIRTS', 'img' => asset('images/category/skirt.png')],
+                ['name' => 'SANDALS', 'img' => asset('images/category/sandals.png')],
+                ['name' => 'OUTERS', 'img' => asset('images/category/outer.png')],
+                ['name' => 'DRESSES', 'img' => asset('images/category/dress.png')],
+                ['name' => 'BAGS', 'img' => asset('images/category/bag.png')],
+                ['name' => 'SHOES', 'img' => asset('images/category/shoes.png')],
+                ['name' => 'HATS', 'img' => asset('images/category/hat.png')],
+                ['name' => 'ACCESSORIES', 'img' => asset('images/category/accessories.png')],
+            ];
+        @endphp
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
+            @foreach($categories as $cat)
+                <a href="#" class="flex flex-col items-center group">
+                    <div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden mb-4 border border-gray-200">
+                        <img src="{{ $cat['img'] }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="{{ $cat['name'] }}">
+                    </div>
+                    <span class="text-xs font-bold tracking-widest text-gray-800">{{ $cat['name'] }}</span>
+                </a>
+            @endforeach
+        </div>
+    </section>
+
+    <section class="w-full relative h-[450px]">
+        <img src="{{ asset('images/banner.png') }}" class="w-full h-full object-cover" alt="Summer Sunset">
+        <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center">
+            <h2 class="text-white text-4xl md:text-6xl font-serif tracking-widest text-center drop-shadow-md">Summer Collection</h2>
+            <p class="text-white text-lg tracking-widest mt-2 drop-shadow-md">Clothique</p>
+        </div>
+    </section>
+
+    <section class="max-w-screen-xl mx-auto px-6 py-16">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            @foreach($trendingProducts as $item)
+                <x-product-card :product="$item" />
+            @endforeach
+        </div>
+    </section>
+
+    <section class="w-full">
+        <div class="w-full relative h-[600px]">
+            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop" class="w-full h-full object-cover" alt="Green Hills">
+            <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
+                <h2 class="text-white text-6xl md:text-8xl font-serif tracking-widest drop-shadow-lg">Clothique</h2>
+            </div>
+        </div>
+        
+        <div class="bg-[#9c8443] px-6 py-16 text-center text-white">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-sm md:text-base leading-relaxed tracking-wide font-light">
+                    Clothique is an exclusive brand committed to modern elegance, bringing you premium collections that blend comfort, quality, and timeless style. From high-end daily wear to statement pieces, we ensure every thread reflects luxury. Discover the art of sophistication with Clothique.
+                </p>
+            </div>
         </div>
     </section>
 

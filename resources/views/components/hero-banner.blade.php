@@ -6,7 +6,7 @@
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto -mt-32 relative z-20 grid grid-cols-3 gap-6 px-6">
+    <div class="max-w-5xl mx-auto -mt-25 relative z-20 grid grid-cols-3 gap-6 px-6">
         @php
             // Ini adalah fondasi datamu.
             // Saat ini statis karena kategori utama jarang berubah. 

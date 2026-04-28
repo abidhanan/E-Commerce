@@ -21,7 +21,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/landingpage', [HomeController::class, 'index'])->name('landingpage');
-Route::get('product.show', [HomeController::class, 'showProduct'])->name('product.show');
+Route::get('/product/{id}', [HomeController::class, 'showProduct'])->name('product.show');
 Route::get('/profil', [ProfileController::class, 'showProfile'])->name('profile');
 
 Route::get('/password/reset', [AuthController::class, 'showForgotPassword'])->name('password.request');

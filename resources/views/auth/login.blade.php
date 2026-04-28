@@ -35,7 +35,6 @@
 
             <div class="mt-8 text-center text-sm text-gray-800 flex flex-col gap-3 border-t border-gray-200 pt-6">
                 <p>Belum punya akun? <a href="{{ route('register') }}" class="text-[#c4a052] font-bold uppercase tracking-wide hover:underline transition">Register</a></p>
-                <p class="text-xs text-gray-500">Akses khusus staf? <a href="{{ url('/admin/register') }}" class="text-black font-bold uppercase hover:underline transition">Daftar Admin</a></p>
             </div>
 
         </div>

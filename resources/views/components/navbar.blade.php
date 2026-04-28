@@ -60,7 +60,7 @@
                     <h3 class="text-sm font-bold text-gray-900 mb-2">Your Bag is empty.</h3>
                     <p class="text-xs text-gray-500 mb-6">Start filling it up with your favourites.</p>
 
-                    <a href="/" class="block w-full bg-[#222] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-4 rounded-xl transition-colors">
+                    <a href="#" class="block w-full bg-[#222] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-4 rounded-xl transition-colors">
                         See what's new
                     </a>
                 </div>

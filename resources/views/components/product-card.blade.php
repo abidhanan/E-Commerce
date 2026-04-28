@@ -1,6 +1,6 @@
 @props(['product'])
 <div class="bg-gray-50 p-2 group rounded-lg hover:shadow-lg transition relative cursor-pointer overflow-hidden transition-all duration-300 ease-out hover:scale-101 hover:shadow-xl">
-    <a href="{{ route('product.show', $product->id) }}" class="block">
+    <a href="{{ route('product.show', $product->id) }}">
         <div class="relative aspect-[3/4] bg-gray-200 mb-3 hover:-translate-y-1 transition all duration-300 rounded-lg">
             <img src="{{ asset('images/products/' . $product->image) }}" class="w-full h-full object-cover" alt="{{ $product->name }}">
             @if(isset($product->discount))

@@ -43,7 +43,6 @@
 
             <div class="mt-8 text-center text-sm text-gray-800 flex flex-col gap-3 border-t border-gray-200 pt-6">
                 <p>Sudah punya akun? <a href="{{ route('login') }}" class="text-[#c4a052] font-bold uppercase tracking-wide hover:underline transition">Login Disini</a></p>
-                <p class="text-xs text-gray-500">Staf internal? <a href="{{ url('/admin/login') }}" class="text-black font-bold uppercase hover:underline transition">Login Admin</a></p>
             </div>
 
         </div>

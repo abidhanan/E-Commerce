@@ -14,4 +14,16 @@ class HomeController extends Controller
 
         return view('User.home', compact('trendingProducts'));
     }
+
+    // Jangan lupa pastikan kamu mengimpor model Product di bagian atas file ini:
+    // use App\Models\Product;
+
+    public function showProduct($id)
+    {
+        // Cari produk berdasarkan ID, jika tidak ada lemparkan error 404
+        $product = \App\Models\Product::findOrFail($id);
+
+        // Arahkan ke file view User/product-detail.blade.php
+        return view('User.product-detail', compact('product'));
+    }
 }
