@@ -36,7 +36,7 @@
                     <input type="password" name="password" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-4 text-sm focus:outline-none focus:border-black transition">
                     
                     <div class="mt-2 text-right">
-                        <a href="{{ url('/password/reset') }}" class="text-[#c4a052] text-xs font-semibold hover:underline">Lupa password?</a>
+                        <a href="{{ url('/password/reset') }}" class="text-[#c4a052] text-xs font-semibold hover:underline">Forgot your password?</a>
                     </div>
                 </div>
 
@@ -46,7 +46,7 @@
             </form>
 
             <div class="mt-8 text-center text-sm text-gray-800 flex flex-col gap-3 border-t border-gray-200 pt-6">
-                <p>Belum punya akun? <a href="{{ route('register') }}" class="text-[#c4a052] font-bold uppercase tracking-wide hover:underline transition">Register</a></p>
+                <p>Don't have an account? <a href="{{ route('register') }}" class="text-[#c4a052] font-bold uppercase tracking-wide hover:underline transition">Register</a></p>
             </div>
 
         </div>

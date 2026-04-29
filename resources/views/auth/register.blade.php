@@ -15,7 +15,7 @@
                 @csrf
                 
                 <div>
-                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Nama</label>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Name</label>
                     <input type="text" name="name" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-4 text-sm focus:outline-none focus:border-black transition">
                 </div>
 
@@ -31,7 +31,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold tracking-wide uppercase mb-2">Konfirmasi Password</label>
+                        <label class="block text-xs font-bold tracking-wide uppercase mb-2">Confirm Password</label>
                         <input type="password" name="password_confirmation" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-4 text-sm focus:outline-none focus:border-black transition">
                     </div>
                 </div>
@@ -42,7 +42,7 @@
             </form>
 
             <div class="mt-8 text-center text-sm text-gray-800 flex flex-col gap-3 border-t border-gray-200 pt-6">
-                <p>Sudah punya akun? <a href="{{ route('login') }}" class="text-[#c4a052] font-bold uppercase tracking-wide hover:underline transition">Login Disini</a></p>
+                <p>Already have an account? <a href="{{ route('login') }}" class="text-[#c4a052] font-bold uppercase tracking-wide hover:underline transition">Login</a></p>
             </div>
 
         </div>
