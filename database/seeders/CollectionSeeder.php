@@ -2,63 +2,43 @@
 
 namespace Database\Seeders;
 
+use App\Models\Collections;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class CollectionSeeder extends Seeder
 {
     public function run(): void
     {
-        $placeholder = 'collections/collection-placeholder.svg';
-        $now = now();
-
         $collections = [
-            [
-                'name' => 'Lebaran',
-                'slug' => 'lebaran',
-                'img' => $placeholder,
-            ],
-            [
-                'name' => 'Winter Essentials',
-                'slug' => 'winter-essentials',
-                'img' => $placeholder,
-            ],
-            [
-                'name' => 'Summer Vibes',
-                'slug' => 'summer-vibes',
-                'img' => $placeholder,
-            ],
-            ['name' => 'Autumn Layering', 'slug' => 'autumn-layering', 'img' => $placeholder],
-            ['name' => 'Office Capsule', 'slug' => 'office-capsule', 'img' => $placeholder],
-            ['name' => 'Weekend Casual', 'slug' => 'weekend-casual', 'img' => $placeholder],
-            ['name' => 'Monochrome Edit', 'slug' => 'monochrome-edit', 'img' => $placeholder],
-            ['name' => 'Resort Escape', 'slug' => 'resort-escape', 'img' => $placeholder],
-            ['name' => 'Sport Mode', 'slug' => 'sport-mode', 'img' => $placeholder],
-            ['name' => 'Denim Days', 'slug' => 'denim-days', 'img' => $placeholder],
-            ['name' => 'Workwear Core', 'slug' => 'workwear-core', 'img' => $placeholder],
-            ['name' => 'Urban Commuter', 'slug' => 'urban-commuter', 'img' => $placeholder],
-            ['name' => 'Minimalist Picks', 'slug' => 'minimalist-picks', 'img' => $placeholder],
-            ['name' => 'Party Night', 'slug' => 'party-night', 'img' => $placeholder],
-            ['name' => 'Eid Special', 'slug' => 'eid-special', 'img' => $placeholder],
-            ['name' => 'Rainy Season', 'slug' => 'rainy-season', 'img' => $placeholder],
-            ['name' => 'Heritage Fit', 'slug' => 'heritage-fit', 'img' => $placeholder],
-            ['name' => 'Street Season', 'slug' => 'street-season', 'img' => $placeholder],
-            ['name' => 'Travel Ready', 'slug' => 'travel-ready', 'img' => $placeholder],
-            ['name' => 'Relaxed Lounge', 'slug' => 'relaxed-lounge', 'img' => $placeholder],
-            ['name' => 'Premium Tailoring', 'slug' => 'premium-tailoring', 'img' => $placeholder],
-            ['name' => 'Coffee Run', 'slug' => 'coffee-run', 'img' => $placeholder],
-            ['name' => 'Festival Edit', 'slug' => 'festival-edit', 'img' => $placeholder],
-            ['name' => 'Daily Uniform', 'slug' => 'daily-uniform', 'img' => $placeholder],
-            ['name' => 'Holiday Capsule', 'slug' => 'holiday-capsule', 'img' => $placeholder],
+            ['name' => 'Alpine Core', 'slug' => 'alpine-core', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Trail Motion', 'slug' => 'trail-motion', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'City Commute', 'slug' => 'city-commute', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Summit Line', 'slug' => 'summit-line', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Ridge Utility', 'slug' => 'ridge-utility', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Forest Layer', 'slug' => 'forest-layer', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Desert Air', 'slug' => 'desert-air', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Coastal Drizzle', 'slug' => 'coastal-drizzle', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Urban Trek', 'slug' => 'urban-trek', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Glacier Transit', 'slug' => 'glacier-transit', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Canyon Light', 'slug' => 'canyon-light', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Night Run', 'slug' => 'night-run', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Monsoon Ready', 'slug' => 'monsoon-ready', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Peak Shelter', 'slug' => 'peak-shelter', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Nomad Travel', 'slug' => 'nomad-travel', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Summit Shift', 'slug' => 'summit-shift', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Trail Form', 'slug' => 'trail-form', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Metro Shell', 'slug' => 'metro-shell', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Timber Camp', 'slug' => 'timber-camp', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Aurora Layer', 'slug' => 'aurora-layer', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Atlas Motion', 'slug' => 'atlas-motion', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Horizon Pack', 'slug' => 'horizon-pack', 'img' => 'collections/collection-placeholder.svg'],
+            ['name' => 'Granite Works', 'slug' => 'granite-works', 'img' => 'collections/collection-placeholder.svg'],
         ];
 
         foreach ($collections as $collection) {
-            DB::table('collections')->updateOrInsert(
+            Collections::query()->updateOrCreate(
                 ['slug' => $collection['slug']],
-                $collection + [
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ],
+                $collection,
             );
         }
     }

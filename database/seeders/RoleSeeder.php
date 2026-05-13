@@ -3,48 +3,40 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach ($this->roles() as $roleName) {
-            Role::firstOrCreate([
-                'name' => $roleName,
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $permissions = collect(config('admin_permissions.groups', []))
+            ->flatMap(fn (array $group) => array_keys($group['permissions'] ?? []))
+            ->unique()
+            ->values()
+            ->all();
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
                 'guard_name' => 'web',
             ]);
         }
-    }
 
-    private function roles(): array
-    {
-        return [
-            'superadmin',
-            'admin',
-            'seller',
-            'user',
-            'guest',
-            'content-manager',
-            'catalog-manager',
-            'support-agent',
-            'warehouse-staff',
-            'marketing-staff',
-            'finance-staff',
-            'moderator',
-            'editor',
-            'blogger',
-            'photographer',
-            'seo-specialist',
-            'brand-manager',
-            'customer-care',
-            'qa-staff',
-            'data-analyst',
-            'merchandiser',
-            'regional-manager',
-            'campaign-manager',
-            'loyalty-manager',
-            'ops-manager',
-        ];
+        $roles = collect(config('admin_permissions.defaults', []))
+            ->map(fn (array $rolePermissions) => in_array('*', $rolePermissions, true) ? $permissions : $rolePermissions)
+            ->all();
+
+        foreach ($roles as $role => $rolePermissions) {
+            Role::firstOrCreate([
+                'name' => $role,
+                'guard_name' => 'web',
+            ])->syncPermissions($rolePermissions);
+        }
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

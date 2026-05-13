@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" fill="none">
+  <rect width="960" height="960" fill="#1C1917"/>
+  <rect x="72" y="72" width="816" height="816" rx="40" fill="#FAF5FF"/>
+  <path d="M308 276h344l92 430H216l92-430Z" fill="#7C3AED"/>
+  <path d="M394 276h172v430H394V276Z" fill="#DDD6FE"/>
+  <text x="120" y="152" fill="#3B0764" font-size="52" font-family="Arial, sans-serif" font-weight="700">DAILY MERINO</text>
+  <text x="120" y="212" fill="#6D28D9" font-size="28" font-family="Arial, sans-serif">Soft base layer with balanced warmth and airflow.</text>
+</svg>

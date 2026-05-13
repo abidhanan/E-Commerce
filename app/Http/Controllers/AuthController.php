@@ -7,113 +7,123 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use App\Models\ActivityLog;
+use Illuminate\Support\Facades\DB;
+use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
-
-
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Auth\Notifications\ResetPassword;
+use App\Models\DisplayLogin;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class AuthController extends Controller
 {
     public function showLogin()
     {
-        return view('auth.login');
+        if (Auth::check()) {
+            return Auth::user()->hasRole('user')
+                ? redirect('/')
+                : redirect('/dashboard');
+        }
+
+        $displayLogins = DisplayLogin::orderBy('position')->get();
+
+        return view('auth.login', compact('displayLogins'));
     }
 
         public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
+            'email' => 'required|email|max:255',
+            'password' => 'required|string'
         ]);
-    
+
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'Email atau password salah'
             ]);
         }
-    
-       
-        $request->session()->regenerate();
-    
-        $user = Auth::user();
-    
-     
-        if (!$user->hasVerifiedEmail()) {
-            // Jangan di-logout! Biarkan masuk tapi lemparkan ke ruang isolasi (verify notice)
-            return redirect()->route('verification.notice');
-        }
-    
-        if ($user->hasRole('superadmin')) {
-            return redirect()->route('dashboard');
-        }
 
-        if ($user->hasRole('admin')) {
-            return redirect('/dashboard/admin');
-        }
-    
-        if ($user->hasRole('seller')) {
-            return redirect('/dashboard/seller');
-        }
-    
-        if ($user->hasRole('user')) {
-            return redirect('/landingpage');
-        }
-    
-        // fallback
-        return redirect('/');
+        $request->session()->regenerate();
+
+        $agent = new Agent();
+
+        ActivityLog::create([
+            'user_id'    => Auth::id(),
+            'event'      => 'login',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'device'     => $agent->device(),
+            'browser'    => $agent->browser(),
+            'platform'   => $agent->platform(),
+        ]);
+
+        // ================= AUTO DELETE > 6 BULAN =================
+        ActivityLog::where('created_at', '<', now()->subMonths(6))->delete();
+
+        return Auth::user()->hasRole('user')
+            ? redirect()->intended('/')
+            : redirect()->intended('/dashboard');
     }
 
     public function showRegister()
 {
-    return view('auth.register');
-}
-
-public function register(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6|confirmed',
-    ]);
-
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-    ]);
-
-    $user->assignRole('user'); 
-
-    $user->sendEmailVerificationNotification(); 
-
-    return redirect('/login')->with('success', 'Registrasi berhasil! Silakan cek kotak masuk email Anda untuk verifikasi.');
+     $displayLogins = DisplayLogin::orderBy('position')->get();
+    return view('auth.register', compact('displayLogins'));
 }
 public function verifyEmail(Request $request, $id, $hash)
 {
-   $user = User::findOrFail($id);
+    $user = User::findOrFail($id);
 
-    if (! hash_equals($hash, sha1($user->email))) {
-        abort(403, 'Link tidak valid');
+    // Validasi hash email
+    if (!hash_equals($hash, sha1($user->getEmailForVerification()))) {
+        abort(403);
     }
 
-    if (! $request->hasValidSignature()) {
-        abort(403, 'Link expired / tidak valid');
+    // Validasi signature URL
+    if (!URL::hasValidSignature($request)) {
+        abort(403);
     }
 
-    if (! $user->hasVerifiedEmail()) {
+    if (!$user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
+        event(new Verified($user));
     }
 
     Auth::login($user);
-
-    return redirect()->route('landingpage')
-        ->with('success', 'Email berhasil diverifikasi');
-
+    if (Auth::user()->hasRole('user')) {
+        return redirect('/')->with('message', 'Email berhasil diverifikasi. Selamat datang di toko kami!');
+    }else{
+    return redirect()->route('dashboard')
+        ->with('message', 'Email berhasil diverifikasi.');
+    }
+   
 }
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        $user->assignRole('user');
+
+        $user->sendEmailVerificationNotification();
+
+        return redirect('/login')->with('message', 'Silakan cek email untuk verifikasi.');
+    }
+
 
     public function logout(Request $request)
     {
@@ -121,40 +131,45 @@ public function verifyEmail(Request $request, $id, $hash)
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
     public function showVerify()
     {
+         $displayLogins = DisplayLogin::orderBy('position')->get();
+   
         if (Auth::user()->hasVerifiedEmail()) {
-            return redirect('/');
+            return redirect('/dashboard');
         }
-        return view('auth.verify');
+        return view('auth.verify', compact('displayLogins'));
     }
 
     public function resendVerification(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect('/');
+            return redirect('/dashboard');
         }
+
         $request->user()->sendEmailVerificationNotification();
+
         return back()->with('status', 'verification-link-sent');
     }
-
     public function showForgotPassword()
 {
-    return view('auth.forgot-password');
+    $displayLogins = DisplayLogin::orderBy('position')->get();
+  
+    return view('auth.forgot-password', compact('displayLogins'));
 }
 
 public function sendResetLinkEmail(Request $request)
 {
     $request->validate([
-        'email' => 'required|email'
+        'email' => 'required|email|max:255'
     ]);
 
     $user = User::where('email', $request->email)->first();
 
     if (!$user) {
-        return back()->withErrors(['email' => 'Email tidak ditemukan']);
+        return back()->with('status', 'Jika email terdaftar, link reset password akan dikirim.');
     }
 
     $token = Password::createToken($user);
@@ -192,13 +207,15 @@ public function sendResetLinkEmail(Request $request)
         }
     });
 
-    return back()->with('status', 'Link reset password berhasil dikirim.');
+    return back()->with('status', 'Jika email terdaftar, link reset password akan dikirim.');
 }
 public function showResetForm(Request $request, $token)
 {
+    $displayLogins = DisplayLogin::orderBy('position')->get();
     return view('auth.reset-password', [
         'token' => $token,
-        'email' => $request->email
+        'email' => $request->email,
+        'displayLogins' => $displayLogins
     ]);
 }
 
@@ -206,8 +223,8 @@ public function reset(Request $request)
 {
     $request->validate([
         'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required|min:6|confirmed',
+        'email' => 'required|email|max:255',
+        'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
     ]);
 
     $status = Password::reset(

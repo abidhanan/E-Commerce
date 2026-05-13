@@ -18,18 +18,18 @@ class CollectionsController extends Controller
         $query->where('name', 'like', '%' . $request->search . '%');
     }
 
-    $collections = $query->latest()->paginate(10)->withQueryString();
+    $collections = $query->latest()->paginate(10);
 
     if ($request->ajax()) {
-        return view('superadmin.collections.partials.table', compact('collections'))->render();
+        return view('admin.collections.partials.table', compact('collections'))->render();
     }
 
-    return view('SuperAdmin.Collections.index', compact('collections'));
+    return view('Admin.Collections.index', compact('collections'));
 }
 
     public function create()
     {
-        return view('SuperAdmin.Collections.create');
+        return view('Admin.Collections.create');
     }
 
     public function store(Request $request)
@@ -45,13 +45,13 @@ class CollectionsController extends Controller
             'img' => $request->file('img')->store('collections','public')
         ]);
 
-        return redirect()->route('superadmin.collections.index');
+        return redirect()->route('admin.collections.index');
     }
 
     public function edit(Collections $collection)
     {
         $collections = Collections::with('products')->find($collection->id);
-        return view('SuperAdmin.Collections.edit', compact('collections'));
+        return view('Admin.Collections.edit', compact('collections'));
     }
 
     public function update(Request $request, Collections $collection)
@@ -72,13 +72,13 @@ class CollectionsController extends Controller
 
         $collection->update($data);
 
-        return redirect()->route('superadmin.collections.index');
+        return redirect()->route('admin.collections.index');
     }
 
     public function destroy(Collections $collection)
     {
         $collection->delete();
 
-        return redirect()->route('superadmin.collections.index');
+        return redirect()->route('admin.collections.index');
     }
 }

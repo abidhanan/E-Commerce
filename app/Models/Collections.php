@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Collections extends Model
 {
-    protected $fillable = ['name','slug','img'];
+   protected $fillable = ['name','slug','img'];
    
     public function products()
     {

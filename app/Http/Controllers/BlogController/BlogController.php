@@ -4,221 +4,179 @@ namespace App\Http\Controllers\BlogController;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Comment;
 use App\Models\CategoryBlog as Category;
 use App\Models\Post;
 use App\Models\TagBlog;
+use App\Support\HtmlSanitizer;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Validation\Rule;
 class BlogController extends Controller
 {
     public function index(Request $request)
-    {
-       
-        $query = Post::with('category');
+{
+   
+    $query = Post::with('category');
 
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-
-        $posts = $query->latest()->paginate(10)->withQueryString();
-
-        if ($request->ajax()) {
-            return view('SuperAdmin.blog.partials.table', compact('posts'))->render();
-        }
-
-        return view('SuperAdmin.blog.index', compact('posts'));
+    if ($request->search) {
+        $query->where('title', 'like', '%' . $request->search . '%');
     }
+
+    $posts = $query->latest()->paginate(10);
+
+    if($request->ajax()) {
+        return view('Admin.Blogs.partials.table', compact('posts'))->render();
+    }
+
+    return view('Admin.Blogs.index', compact('posts'));
+}
 
     public function create()
     {
-        $categories = Category::orderBy('name')->get();
-        $tags = TagBlog::orderBy('name')->get();
-
-        return view('SuperAdmin.blog.create', compact('categories', 'tags'));
+        $categories = Category::all();
+        $tags = TagBlog::all();
+        return view('Admin.Blogs.create', compact('categories','tags'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'category_id' => 'required|exists:category_blogs,id',
+            'category_id' => 'required',
             'title'       => 'required|string|max:255',
             'content'     => 'required|string',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'tags'        => 'nullable|array',
             'tags.*'      => 'exists:tag_blogs,id'
+        ],
+        [
+            'category_id.required' => 'Kategori harus dipilih.',
+            'title.required' => 'Judul tidak boleh kosong.',
+            'content.required' => 'Konten tidak boleh kosong.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Gambar harus berformat jpg, jpeg, png, atau webp.',
+            'image.max' => 'Ukuran gambar maksimal 2MB.',
+            'tags.array' => 'Tags harus berupa array.',
+            'tags.*.exists' => 'Tag yang dipilih tidak valid.',
+           
         ]);
 
+        if (Post::where('title', trim($validated['title']))->exists()) {
+            return back()
+                ->withErrors([
+                    'title' => 'Judul blog sudah digunakan'
+                ])
+                ->withInput();
+        }
         $cleanContent = $this->cleanTrix($validated['content']);
-        $imagePath = null;
 
+       
+        $imagePath = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $filename = time().'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
             $imagePath = $file->storeAs('blogs', $filename, 'public');
         }
 
-        Post::create([
-            'user_id'      => auth()->id(),
-            'category_id'  => $validated['category_id'],
-            'tag_id'       => $validated['tags'] ?? [],
-            'title'        => trim($validated['title']),
-            'slug'         => $this->generateUniqueSlug($validated['title']),
-            'excerpt'      => Str::limit(trim(strip_tags($cleanContent)), 160),
-            'content'      => $cleanContent,
-            'thumbnail'    => $imagePath,
-            'status'       => 'draft',
-            'published_at' => null,
-        ]);
+    $post = Post::create([
+        'user_id'     => auth()->id(),
+        'category_id' => $validated['category_id'],
+        'tag_id'      => $validated['tags'] ?? [],
+        'title'       => trim($validated['title']),
+        'slug'        => Str::slug($validated['title']),
+        'content'     => $cleanContent,
+        'thumbnail'   => $imagePath,
+        'status'      => 'draft',
+    ]);
+    return redirect()
+        ->route('admin.blogs.index')
+        ->with('success', 'Blog berhasil dibuat');
+}
 
-        return redirect()
-            ->route('superadmin.blogs.index')
-            ->with('success', 'Blog berhasil dibuat');
-    }
-
-    public function relaseblog(Post $blog)
+    private function cleanTrix($content)
     {
-        $blog->update([
-            'status' => 'published',
-            'published_at' => $blog->published_at ?? now(),
-        ]);
-
-        return redirect()
-            ->route('superadmin.blogs.index')
-            ->with('success', 'Blog berhasil dipublish');
+        return HtmlSanitizer::clean(
+            (string) $content,
+            ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'blockquote', 'div', 'h1', 'h2', 'h3', 'a', 'img'],
+            true
+        );
     }
+public function relaseblog(Post $blog)
+{
+    $blog->update(['status' => 'published']);
 
-    public function edit(Post $blog)
-    {
-        $categories = Category::orderBy('name')->get();
-        $tags = TagBlog::orderBy('name')->get();
+    return redirect()
+        ->route('admin.blogs.index')
+        ->with('success', 'Blog berhasil dirilis');
+}
 
-        return view('SuperAdmin.blog.edit', compact('blog', 'categories', 'tags'));
-    }
+public function edit(Post $blog)
+{
+    $categories = Category::all();
+    $tags = TagBlog::all();
+    return view('Admin.blogs.edit', compact('blog', 'categories','tags'));
+}
 
-    public function update(Request $request, Post $blog)
-    {
-        $validated = $request->validate([
-            'category_id' => 'required|exists:category_blogs,id',
-            'title'       => 'required|string|max:255',
-            'content'     => 'required|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'tags'        => 'nullable|array',
-            'tags.*'      => 'exists:tag_blogs,id'
-        ]);
+public function update(Request $request, Post $blog)
+{
+    $validated = $request->validate([
+        'category_id' => 'required',
+        'title' => [
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('posts', 'title')->ignore($blog->id)
+        ],
+        'content' => 'required|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'tags' => 'nullable|array',
+        'tags.*' => 'exists:tag_blogs,id'
+    ], [
+        'title.unique' => 'Judul blog sudah digunakan'
+    ]);
 
-        $cleanContent = $this->cleanTrix($validated['content']);
-        $data = [
-            'category_id' => $validated['category_id'],
-            'title'       => trim($validated['title']),
-            'slug'        => $blog->title !== trim($validated['title'])
-                ? $this->generateUniqueSlug($validated['title'], $blog)
-                : $blog->slug,
-            'excerpt'     => Str::limit(trim(strip_tags($cleanContent)), 160),
-            'content'     => $cleanContent,
-            'tag_id'      => $validated['tags'] ?? [],
-        ];
-
-        if ($request->hasFile('image')) {
-            if ($blog->thumbnail) {
-                Storage::disk('public')->delete($blog->thumbnail);
-            }
-
-            $file = $request->file('image');
-            $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-            $data['thumbnail'] = $file->storeAs('blogs', $filename, 'public');
-        }
-
-        if ($blog->status === 'published' && ! $blog->published_at) {
-            $data['published_at'] = now();
-        }
-
-        $blog->update($data);
-
-        return redirect()
-            ->route('superadmin.blogs.index')
-            ->with('success', 'Blog berhasil diperbarui');
-    }
-
-    public function destroy(Post $blog)
-    {
+    // 🔥 FILTER TRIX CONTENT
+    $cleanContent = $this->cleanTrix($validated['content']);
+   
+    // upload image
+    if ($request->hasFile('image')) {
+        // hapus thumbnail lama
         if ($blog->thumbnail) {
-            Storage::disk('public')->delete($blog->thumbnail);
+            \Storage::disk('public')->delete($blog->thumbnail);
         }
 
-        $blog->delete();
-
-        return redirect()
-            ->route('superadmin.blogs.index')
-            ->with('success', 'Blog berhasil dihapus');
+        $file = $request->file('image');
+        $filename = time().'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
+        $imagePath = $file->storeAs('blogs', $filename, 'public');
+        $blog->thumbnail = $imagePath;
     }
 
-    private function cleanTrix(string $content): string
-    {
-        $content = preg_replace('#<(script|iframe|object|embed)(.*?)>(.*?)</\1>#is', '', $content);
-        $content = preg_replace('/on\w+="[^"]*"/i', '', $content);
-        $content = preg_replace("/on\w+='[^']*'/i", '', $content);
-        $content = preg_replace('/style="[^"]*"/i', '', $content);
-        $content = preg_replace("/style='[^']*'/i", '', $content);
-        $content = preg_replace('/(href|src)\s*=\s*"(javascript|data|vbscript):[^"]*"/i', '$1="#"', $content);
-        $content = preg_replace("/(href|src)\s*=\s*'(javascript|data|vbscript):[^']*'/i", "$1='#'", $content);
+    $blog->update([
+        'category_id' => $validated['category_id'],
+        'title' => $validated['title'],
+        'content' => $cleanContent,
+        'tag_id' => $validated['tags'] ?? []
+    ]);
 
-        $allowed = '<p><br><strong><em><ul><ol><li><blockquote><div><h1><h2><h3><a><img>';
-        $content = strip_tags($content, $allowed);
+    return redirect()
+        ->route('admin.blogs.index')
+        ->with('success', 'Blog berhasil diperbarui');
+}
 
-        $content = preg_replace_callback('/<a\s+([^>]+)>/i', function ($matches) {
-            preg_match('/href=["\']([^"\']+)["\']/', $matches[1], $href);
-            $url = $href[1] ?? '#';
 
-            if (! preg_match('#^https?://#i', $url)) {
-                $url = '#';
-            }
+public function destroy(Post $blog)
+{
+    
 
-            return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">';
-        }, $content);
-
-        $content = preg_replace_callback('/<img\s+([^>]+)>/i', function ($matches) {
-            preg_match('/src=["\']([^"\']+)["\']/', $matches[1], $src);
-            $url = $src[1] ?? '';
-
-            if (! preg_match('#^https?://#i', $url)) {
-                return '';
-            }
-
-            return '<img src="' . $url . '" alt="" />';
-        }, $content);
-
-        return preg_replace('/<(\w+)[^>]*>\s*<\/\1>/', '', $content);
+    // hapus thumbnail
+    if ($blog->thumbnail) {
+        \Storage::disk('public')->delete($blog->thumbnail);
     }
 
-    private function generateUniqueSlug(string $title, ?Post $ignorePost = null): string
-    {
-        $baseSlug = Str::slug($title);
+    $blog->delete();
 
-        if ($baseSlug === '') {
-            $baseSlug = 'blog';
-        }
-
-        $slug = $baseSlug;
-        $counter = 1;
-
-        while ($this->slugExists($slug, $ignorePost)) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
-        }
-
-        return $slug;
-    }
-
-    private function slugExists(string $slug, ?Post $ignorePost = null): bool
-    {
-        $query = Post::where('slug', $slug);
-
-        if ($ignorePost) {
-            $query->where('id', '!=', $ignorePost->id);
-        }
-
-        return $query->exists();
-    }
+    return redirect()
+        ->route('admin.blogs.index')
+        ->with('success', 'Blog berhasil dihapus');
+}
 
 }

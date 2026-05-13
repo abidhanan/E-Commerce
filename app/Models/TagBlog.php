@@ -6,9 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class TagBlog extends Model
 {
-    protected $table = 'tag_blogs';
-
-    protected $fillable = [
-        'name',
-    ];
+    protected $fillable = ['id','name'];
 }

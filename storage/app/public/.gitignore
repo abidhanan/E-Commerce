@@ -1,2 +1,8 @@
 *
 !.gitignore
+!categories/
+!categories/*.svg
+!collections/
+!collections/*.svg
+!products/
+!products/*.svg

@@ -5,38 +5,35 @@ namespace App\Http\Controllers\BlogController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\TagBlog as Tag;
-
 class TagController extends Controller
 {
     public function index(Request $request)
     {
-        $tags = Tag::latest()->get();
-
-        return view('SuperAdmin.blog.tags.index', compact('tags'));
+        $tags = Tag::all();
+        return view('Admin.Blogs.tags.index', compact('tags'));
     }
 
     public function create()
     {
-        return view('SuperAdmin.blog.tags.create');
+        return view('Admin.Blogs.tags.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:tag_blogs,name',
+            'name' => 'required|string|max:255|unique:tag_blogs,name,'.$request->id,
         ]);
 
         Tag::create([
-            'name' => trim($request->name),
+            'name' => $request->name,
         ]);
 
-        return redirect()->route('superadmin.tags.index')
-            ->with('success', 'Tag berhasil dibuat.');
+        return redirect()->route('admin.tags.index')->with('success', 'Tag created successfully.');
     }
 
     public function edit(Tag $tag)
     {
-        return view('SuperAdmin.blog.tags.edit', compact('tag'));
+        return view('Admin.Blogs.tags.edit', compact('tag'));
     }
 
     public function update(Request $request, Tag $tag)
@@ -51,15 +48,13 @@ class TagController extends Controller
             'name' => $name,
         ]);
 
-        return redirect()->route('superadmin.tags.index')
-            ->with('success', 'Tag berhasil diperbarui.');
+        return redirect()->route('admin.tags.index')
+            ->with('success', 'Tag updated successfully.');
     }
 
     public function destroy(Tag $tag)
     {
         $tag->delete();
-
-        return redirect()->route('superadmin.tags.index')
-            ->with('success', 'Tag berhasil dihapus.');
+        return redirect()->back()->with('success', 'Tag deleted successfully.');
     }
 }

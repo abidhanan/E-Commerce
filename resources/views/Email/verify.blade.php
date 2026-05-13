@@ -1,55 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <title>Verify Email - Clothique</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Email</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="margin:0; padding:0; background-color:#fafafa; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">
 
-    <table width="100%" bgcolor="#fafafa" cellpadding="0" cellspacing="0" border="0">
+<body
+    style="margin:0; padding:0; background-color:#ffffff; font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em;">
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff;">
         <tr>
-            <td align="center" style="padding: 60px 20px;">
+            <td align="center" style="padding:40px 20px;">
 
-                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border: 1px solid #e5e5e5;">
-                    
+                <table width="600" cellpadding="0" cellspacing="0" border="0"
+                    style="max-width:600px; background-color:#ffffff; border:1px solid #e0e0e0;">
+
+                    <!-- ── LOGO ── -->
                     <tr>
-                        <td align="center" style="padding: 50px 20px 20px 20px;">
-                            <h1 style="margin:0; font-size:32px; font-weight:normal; letter-spacing:6px; text-transform:uppercase; color:#000000;">
-                                Clothique
-                            </h1>
-                            <div style="height:2px; width:40px; background-color:#000000; margin: 25px auto 0 auto;"></div>
+                        <td style="padding:32px 40px 0 40px;">
+                            <img src="{{ asset('images/logo.png') }}" alt="Gloaming" height="40"
+                                style="display:block; height:40px; max-width:140px; border:0;">
                         </td>
                     </tr>
 
+                    <!-- ── JUDUL ── -->
                     <tr>
-                        <td style="padding: 30px 50px 50px 50px; text-align:center;">
-                            
-                            <h2 style="margin:0 0 20px 0; font-size:16px; font-weight:bold; letter-spacing:3px; text-transform:uppercase; color:#000000;">
-                                Verify Your Email
-                            </h2>
-
-                            <p style="margin:0 0 30px 0; font-size:14px; line-height:1.8; color:#555555; font-weight:300;">
-                                Welcome to the exclusive world of Clothique. To ensure the security of your account and begin your journey with us, please verify your email address by clicking the button below.
+                        <td style="padding:18px 40px 0 40px;">
+                            <p
+                                style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:30px; font-weight:700; color:#1a1a1a; letter-spacing:-1px; line-height:1.2; margin:0 0 14px 0;">
+                                Verifikasi Email
                             </p>
-
-                            <div style="margin: 40px 0;">
-                                <a href="{{ $url }}" 
-                                   style="background-color:#000000; color:#ffffff; padding:18px 36px; font-size:12px; font-weight:bold; letter-spacing:3px; text-transform:uppercase; text-decoration:none; display:inline-block;">
-                                    Verify Email
-                                </a>
-                            </div> 
-
-                            <p style="margin:0 0 10px 0; font-size:12px; color:#999999; line-height:1.5;">
-                                If you did not create an account with Clothique, please ignore this email. No further action is required.
-                            </p>
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="border-top:1px solid #e0e0e0; height:1px; font-size:0; line-height:0;">
+                                        &nbsp;</td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
+                    <!-- ── ISI ── -->
                     <tr>
-                        <td style="background-color:#000000; padding:40px 20px; text-align:center;">
-                            <p style="margin:0; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#888888;">
-                                © {{ date('Y') }} Clothique. All rights reserved.
+                        <td style="padding:28px 40px 32px 40px;">
+
+                            <p
+                                style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:14px; font-weight:500; color:#1a1a1a; line-height:1.7; margin:0 0 14px 0;">
+                                Halo <strong>{{ $name ?? 'Ela Herawati' }}</strong>.
                             </p>
+
+                            <p
+                                style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:13px; color:#3a3a3a; line-height:1.75; margin:0 0 28px 0;">
+                                Terimakasih telah bergabung dengan <strong
+                                    style="color:#1a1a1a;">{{ config('app.name', 'Gloaming Official') }}</strong>.<br>
+                                Demi keamanan akun dan kenyamanan bertransaksi, mohon lakukan verifikasi email Anda
+                                dengan menekan tombol berikut.
+                            </p>
+
+                            <!-- ── TOMBOL ── -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="center" style="padding:0 0 28px 0;">
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td align="center" bgcolor="#1a1a1a" style="border-radius:8px;">
+                                                    <a href="{{ $verifyUrl ?? '#' }}"
+                                                        style="display:inline-block; padding:14px 48px; font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:14px; font-weight:600; color:#ffffff; text-decoration:none; border-radius:1px; background-color:#1a1a1a;">
+                                                        Verifikasi Email
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p
+                                style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:13px; color:#3a3a3a; line-height:1.75; margin:0 0 18px 0;">
+                                Jika Anda tidak merasa membuat akun di <strong
+                                    style="color:#1a1a1a;">{{ config('app.name', 'Gloaming Official') }}</strong>,
+                                silakan abaikan email ini.
+                            </p>
+
+                            <p
+                                style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:13px; color:#3a3a3a; margin:0 0 8px 0;">
+                                Sincerely
+                            </p>
+
+                            <img src="{{ asset('images/logotype.png') }}" alt="Gloaming" height="32"
+                                style="display:block; height:32px; max-width:160px; border:0;">
+
+                        </td>
+                    </tr>
+
+                    <!-- ── FOOTER ── -->
+                    <tr>
+                        <td align="center" style="padding:22px 20px; background-color:#1a1a1a;">
+
+                            <table cellpadding="0" cellspacing="0" border="0" align="center">
+                                <tr>
+
+                                    <td align="center" valign="top" style="padding:0 12px;">
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:8px; font-weight:700; color:#C8A97E; margin:0 0 2px 0; white-space:nowrap;">
+                                            instagram:</p>
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:9px; color:#aaaaaa; margin:0; white-space:nowrap;">
+                                            @gloamingofficial</p>
+                                    </td>
+
+                                    <td align="center" valign="top" style="padding:0 12px;">
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:8px; font-weight:700; color:#C8A97E; margin:0 0 2px 0; white-space:nowrap;">
+                                            tiktok:</p>
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:9px; color:#aaaaaa; margin:0; white-space:nowrap;">
+                                            @gloamingofficial</p>
+                                    </td>
+
+                                    <td align="center" valign="top" style="padding:0 12px;">
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:8px; font-weight:700; color:#C8A97E; margin:0 0 2px 0; white-space:nowrap;">
+                                            shopee:</p>
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:9px; color:#aaaaaa; margin:0; white-space:nowrap;">
+                                            Gloaming Official</p>
+                                    </td>
+
+                                    <td align="center" valign="top" style="padding:0 12px;">
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:8px; font-weight:700; color:#C8A97E; margin:0 0 2px 0; white-space:nowrap;">
+                                            zalora:</p>
+                                        <p
+                                            style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:9px; color:#aaaaaa; margin:0; white-space:nowrap;">
+                                            Gloaming Official</p>
+                                    </td>
+
+                                </tr>
+                            </table>
+
+                            <p
+                                style="font-family:'Poppins',Arial,sans-serif; letter-spacing:-0.05em; font-size:10px; color:#666666; margin:16px 0 0 0;">
+                                &copy; {{ date('Y') }} {{ config('app.name', 'Gloaming Official') }}. All rights
+                                reserved.
+                            </p>
+
                         </td>
                     </tr>
 
@@ -60,4 +157,5 @@
     </table>
 
 </body>
+
 </html>

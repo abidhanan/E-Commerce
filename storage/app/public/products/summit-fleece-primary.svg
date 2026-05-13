@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" fill="none">
+  <rect width="960" height="960" fill="#1F2937"/>
+  <rect x="72" y="72" width="816" height="816" rx="40" fill="#FEF3C7"/>
+  <path d="M224 720c0-156 115-284 256-284s256 128 256 284H224Z" fill="#D97706"/>
+  <rect x="430" y="244" width="100" height="252" rx="32" fill="#FDE68A"/>
+  <text x="120" y="152" fill="#111827" font-size="52" font-family="Arial, sans-serif" font-weight="700">SUMMIT FLEECE</text>
+  <text x="120" y="212" fill="#78350F" font-size="28" font-family="Arial, sans-serif">Warm mid-layer with easy daily comfort.</text>
+</svg>

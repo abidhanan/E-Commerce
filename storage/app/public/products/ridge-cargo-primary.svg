@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" fill="none">
+  <rect width="960" height="960" fill="#111827"/>
+  <rect x="72" y="72" width="816" height="816" rx="40" fill="#F5F5F4"/>
+  <path d="M346 208h108l36 160-52 382H276l70-542Z" fill="#78716C"/>
+  <path d="M506 208h108l70 542H522l-52-382 36-160Z" fill="#57534E"/>
+  <rect x="282" y="426" width="120" height="100" rx="18" fill="#A8A29E"/>
+  <rect x="558" y="426" width="120" height="100" rx="18" fill="#A8A29E"/>
+  <text x="120" y="152" fill="#1C1917" font-size="52" font-family="Arial, sans-serif" font-weight="700">RIDGE CARGO</text>
+  <text x="120" y="212" fill="#57534E" font-size="28" font-family="Arial, sans-serif">Stretch trail pants with practical utility pockets.</text>
+</svg>

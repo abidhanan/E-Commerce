@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" fill="none">
+  <rect width="960" height="960" fill="#0B3B2E"/>
+  <rect x="72" y="72" width="816" height="816" rx="40" fill="#ECFDF5"/>
+  <path d="M308 278h344l94 444H214l94-444Z" fill="#059669"/>
+  <path d="M386 278h188v444H386V278Z" fill="#A7F3D0"/>
+  <text x="120" y="152" fill="#064E3B" font-size="52" font-family="Arial, sans-serif" font-weight="700">TRAIL SPRINT TEE</text>
+  <text x="120" y="212" fill="#065F46" font-size="28" font-family="Arial, sans-serif">Quick-dry layer for high-output movement.</text>
+</svg>
