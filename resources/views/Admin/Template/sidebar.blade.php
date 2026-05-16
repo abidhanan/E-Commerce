@@ -506,7 +506,7 @@
     <a href="{{ route('dashboard') }}" class="sidebar-brand">
         <span class="sidebar-brand-mark"><img src="{{ asset('images/logo.png') }}" alt=""></span>
         <span class="sidebar-brand-copy">
-            <strong>Gloaming</strong>
+            <strong>E-Store</strong>
             <span>Manage store content and catalog</span>
         </span>
     </a>
