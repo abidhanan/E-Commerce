@@ -36,6 +36,7 @@
                 'admin.return-steps.*',
                 'admin.how-to-buy-steps.*',
                 'admin.care-guides.*',
+                'admin.consent-documents.*',
             ],
             'children' => [
                 [
@@ -105,6 +106,12 @@
                     'icon' => 'bi bi-journal-text',
                     'route' => 'admin.care-guides.index',
                     'active' => ['admin.care-guides.*'],
+                ],
+                [
+                    'label' => 'Consent Documents',
+                    'icon' => 'bi bi-file-earmark-lock',
+                    'route' => 'admin.consent-documents.index',
+                    'active' => ['admin.consent-documents.*'],
                 ],
                 [
                     'label' => 'Crash Replacements',
@@ -506,8 +513,8 @@
     <a href="{{ route('dashboard') }}" class="sidebar-brand">
         <span class="sidebar-brand-mark"><img src="{{ asset('images/logo.png') }}" alt=""></span>
         <span class="sidebar-brand-copy">
-            <strong>E-Store</strong>
-            <span>Manage store content and catalog</span>
+            <strong>E-Store Studio</strong>
+            <span>Brand operations, catalog, orders, and content.</span>
         </span>
     </a>
 
@@ -602,7 +609,7 @@
 
     <div class="sidebar-footer">
         <div class="sidebar-footer-copy">
-            Akses cepat ke storefront untuk cek hasil perubahan landing page dan katalog.
+            Preview storefront after publishing catalog, display, and content changes.
         </div>
         <a href="{{ route('home') }}" class="btn btn-outline-dark">
             <i class="bi bi-box-arrow-up-right"></i>

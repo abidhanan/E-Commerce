@@ -4,8 +4,8 @@
 @push('styles')
     <style>
         .selection-overview-card {
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 244, 0.96));
+            border: 1px solid var(--border-soft);
+            background: var(--white);
         }
 
         .best-product-card {
@@ -15,7 +15,7 @@
 
         .best-product-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 14px 28px rgba(16, 24, 20, 0.08);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
         }
 
         .best-product-card.is-selected {
@@ -28,7 +28,7 @@
             height: 220px;
             object-fit: cover;
             border-radius: 14px;
-            background: #efefef;
+            background: var(--soft-bg);
         }
     </style>
 @endpush

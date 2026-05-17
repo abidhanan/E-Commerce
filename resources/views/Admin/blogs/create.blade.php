@@ -5,7 +5,7 @@
 @push('styles')
     <style>
         .trix-content blockquote {
-            border-left: 4px solid #222;
+            border-left: 4px solid var(--gold);
             padding-left: 20px;
             margin: 30px 0;
         }

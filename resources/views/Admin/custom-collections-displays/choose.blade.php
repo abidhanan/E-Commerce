@@ -9,7 +9,7 @@
             height: 180px;
             object-fit: cover;
             border-radius: 12px;
-            background: #f3f3f3;
+            background: var(--soft-bg);
         }
 
         .product-card {
@@ -23,8 +23,8 @@
         }
 
         .product-card.is-selected {
-            border-color: #212529;
-            box-shadow: 0 10px 20px rgba(33, 37, 41, 0.10);
+            border-color: var(--gold);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.10);
         }
 
         .product-card-image {
@@ -32,7 +32,7 @@
             height: 220px;
             object-fit: cover;
             border-radius: 10px;
-            background: #f3f3f3;
+            background: var(--soft-bg);
         }
     </style>
 @endpush

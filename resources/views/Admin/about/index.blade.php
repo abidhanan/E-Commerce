@@ -9,7 +9,7 @@
         /* Trix editor */
         trix-editor {
             min-height: 300px;
-            background: #fff;
+            background: var(--white);
         }
 
         /* Styling hasil content */
@@ -45,7 +45,7 @@
         }
 
         .about-preview blockquote {
-            border-left: 4px solid #222;
+            border-left: 4px solid var(--gold);
             padding-left: 20px;
             margin: 30px 0;
         }

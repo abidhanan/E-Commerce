@@ -17,7 +17,7 @@
             align-items: center;
             justify-content: center;
             background: var(--accent);
-            color: #fff;
+            color: var(--white);
             font-size: 1.65rem;
             font-weight: 800;
         }

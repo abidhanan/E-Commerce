@@ -13,8 +13,8 @@
         }
 
         .collection-card.is-active {
-            border-color: #212529;
-            box-shadow: 0 12px 24px rgba(33, 37, 41, 0.12);
+            border-color: var(--gold);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
         }
 
         .collection-thumb {
@@ -22,7 +22,7 @@
             height: 220px;
             object-fit: cover;
             border-radius: 10px;
-            background: #f3f3f3;
+            background: var(--soft-bg);
         }
     </style>
 @endpush

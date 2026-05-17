@@ -20,7 +20,7 @@
             width: 140px;
             height: 140px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.10), transparent 68%);
+            background: var(--soft-bg);
         }
 
         .admin-stat-icon {
@@ -30,7 +30,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.08);
+            background: var(--soft-bg);
             color: var(--accent);
             font-size: 1.35rem;
         }

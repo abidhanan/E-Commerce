@@ -11,15 +11,47 @@
             </button>
 
             <div class="min-w-0">
-                <span class="admin-topbar-label">Shop Admin</span>
+                <span class="admin-topbar-label">Operations Studio</span>
                 <h1 class="admin-topbar-title text-truncate">{{ $pageTitle ?? 'Admin Panel' }}</h1>
             </div>
         </div>
 
         <div class="ms-auto d-flex align-items-center gap-2 gap-lg-3">
+            @can('manage products')
+                <form class="admin-topbar-search d-none d-xl-block" action="{{ route('admin.products.index') }}" method="GET">
+                    <i class="bi bi-search"></i>
+                    <input class="form-control" type="search" name="search" placeholder="Find products, catalog entries..."
+                        value="{{ request('search') }}" aria-label="Search admin content">
+                </form>
+            @endcan
+
             <div class="admin-topbar-meta">
                 <i class="bi bi-calendar3"></i>
                 <span>{{ now()->format('D, d M Y') }}</span>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn admin-icon-button dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-label="Notifications" id="adminNotificationToggle">
+                    <i class="bi bi-bell"></i>
+                    <span class="admin-notification-dot d-none" id="adminNotificationDot"></span>
+                    <span class="admin-notification-count d-none" id="adminNotificationCount">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end admin-notification-menu">
+                    <div class="admin-notification-header">
+                        <div>
+                            <h6>Notifications</h6>
+                            <span id="adminNotificationMeta">Syncing updates...</span>
+                        </div>
+                        <button type="button" class="admin-notification-read" id="adminNotificationReadBtn">
+                            Mark read
+                        </button>
+                    </div>
+
+                    <div class="admin-notification-list" id="adminNotificationList">
+                        <div class="admin-notification-empty">Loading notifications...</div>
+                    </div>
+                </div>
             </div>
 
             <div class="dropdown">

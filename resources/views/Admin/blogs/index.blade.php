@@ -50,7 +50,7 @@
         }
 
         .trix-content blockquote {
-            border-left: 4px solid #222;
+            border-left: 4px solid var(--gold);
             padding-left: 15px;
             margin: 20px 0;
         }

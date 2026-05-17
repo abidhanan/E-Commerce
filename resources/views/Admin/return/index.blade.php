@@ -5,16 +5,16 @@
 @push('css')
     <style>
         .badge-active {
-            background: #198754;
-            color: white;
+            background: var(--gold);
+            color: var(--white);
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
         }
 
         .badge-inactive {
-            background: #dc3545;
-            color: white;
+            background: var(--dark);
+            color: var(--white);
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;

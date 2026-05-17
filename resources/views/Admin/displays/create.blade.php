@@ -9,7 +9,7 @@
             object-fit: cover;
             border-radius: 8px;
             margin-top: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-soft);
         }
     </style>
 @endpush

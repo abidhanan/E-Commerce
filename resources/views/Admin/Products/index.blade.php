@@ -22,8 +22,8 @@
         }
 
         .product-help-panel {
-            border: 1px solid #dbe5f3;
-            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            border: 1px solid var(--border-soft);
+            background: var(--white);
         }
 
         @media (max-width: 575.98px) {

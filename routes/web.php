@@ -26,6 +26,7 @@ use App\Http\Controllers\MainController\OrderHistoryController;
 use App\Http\Controllers\Admin\OrderComplaintController as AdminOrderComplaintController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PerformanceController;
 use App\Http\Controllers\Admin\RoleAccessController;
 use App\Http\Controllers\LandingpageController\DisplayController;
@@ -38,6 +39,7 @@ use App\Http\Controllers\LandingpageController\StepController;
 use App\Http\Controllers\LandingpageController\CareGuideController;
 use App\Http\Controllers\LandingpageController\DisplayLoginController;
 use App\Http\Controllers\LandingpageController\CrashReplacementController;
+use App\Http\Controllers\LandingpageController\ConsentDocumentController;
 use App\Http\Controllers\MainController\PostController;
 use App\Http\Controllers\MainController\CategoriesController;
 use App\Http\Controllers\MainController\CollectionsController as MainCollectionsController;
@@ -58,6 +60,7 @@ Route::get('/explore', [PostController::class, 'index'])->name('explore.index');
 Route::get('/return-policy', [LandingpageController::class, 'returnPolicy'])->name('return-policy');
 Route::get('/how-to-buy', [LandingpageController::class, 'howToBuy'])->name('how-to-buy');
 Route::get('/crash-replacement', [LandingpageController::class, 'crashReplacement'])->name('crash-replacement');
+Route::get('/legal/{slug}', [ConsentDocumentController::class, 'showPublic'])->name('legal.show');
 Route::get('/category/{category}', [CategoriesController::class, 'index'])->name('category.show');
 Route::get('/collection/{collection}', [MainCollectionsController::class, 'show'])->name('collection.show');
 Route::get('/post',[PostController::class,'index'])->name('post');
@@ -153,6 +156,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('performance/{staff}', [PerformanceController::class, 'show'])->name('performance.show');
             });
 
+            Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
             Route::middleware('role:superadmin|admin|finance')
                 ->prefix('finance')
                 ->name('finance.')
@@ -192,6 +197,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::patch('display-logins/{displayLogin}/toggle-status', [DisplayLoginController::class, 'toggleStatus'])->name('display-logins.toggle-status');
                 Route::post('display-logins/reorder', [DisplayLoginController::class, 'reorder'])->name('display-logins.reorder');
                 Route::resource('display-logins', DisplayLoginController::class);
+                Route::resource('consent-documents', ConsentDocumentController::class)
+                    ->parameters(['consent-documents' => 'consentDocument'])
+                    ->except('show');
                 Route::resource('aboutus', AboutUsController::class);
                 Route::post('aboutus/upload', [AboutUsController::class, 'upload'])
                     ->name('aboutus.upload');
