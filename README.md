@@ -1,59 +1,307 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel E-Commerce
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi e-commerce berbasis Laravel yang dapat disesuaikan untuk berbagai jenis toko online. Aplikasi ini mencakup storefront, katalog produk, checkout, manajemen pesanan, pembayaran Midtrans, blog, konten landing page, laporan finance, dan panel admin berbasis role.
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Storefront publik: home, shop, detail produk, kategori, collection, search, about, FAQ, care guide, return policy, how to buy, crash replacement, legal document, dan blog.
+- Akun customer: register, login, verifikasi email, reset password, profil, alamat, wishlist, cart, checkout, histori pesanan, review, dan komplain pesanan dengan foto.
+- Checkout: alur order dari cart atau direct checkout, validasi stok varian, alamat pengiriman, catatan customer, dan pembuatan kode order.
+- Pembayaran: integrasi Midtrans Snap dan callback, halaman status pembayaran, verifikasi signature callback, serta dukungan link pembayaran manual setelah admin melakukan quote ongkir.
+- Admin catalog: produk, gambar produk, varian, kategori, collections, size guide, temperature, intensities, insulation, breathability, dan materials.
+- Admin content: display landing page, best seller, custom collections, social link, FAQ, about us, how-to-buy step, return step, care guide, crash replacement, consent document, blog category, tag, dan post.
+- Admin order: daftar order, detail order, quote ongkir dan total pembayaran, update status, komplain order, review, dan lifecycle stok.
+- Finance: dashboard revenue, piutang, status transaksi, top product, daftar transaksi, filter, dan export CSV.
+- Akses internal: role `superadmin`, `admin`, `editor`, `finance`, `staff`, dan `user` memakai Spatie Laravel Permission.
+- Audit internal: aktivitas mutasi data admin dicatat melalui middleware `admin.activity`.
+- Keamanan dasar: rate limit auth, email verification, CSRF untuk web form, signature Midtrans callback, dan security headers.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP `^8.2`
+- Laravel `^12.0`
+- SQLite default dari `.env.example`, bisa diganti ke MySQL/MariaDB/PostgreSQL lewat konfigurasi Laravel
+- Vite `^7`
+- Tailwind CSS `^4`
+- Bootstrap 5 dan Bootstrap Icons pada template admin
+- Midtrans PHP SDK
+- Spatie Laravel Permission
+- Jenssegers Agent untuk metadata device/browser pada activity log
+- PHPUnit untuk test
 
-## Learning Laravel
+## Struktur Penting
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```text
+app/Http/Controllers     Controller storefront, auth, checkout, payment, admin, dan content
+app/Models               Model produk, order, user, blog, landing page, dan atribut katalog
+app/Services             Service lifecycle order dan stok
+app/Notifications        Email verifikasi dan notifikasi order
+config/admin_permissions.php
+                         Definisi role dan permission admin
+config/midtrans.php      Konfigurasi key Midtrans
+database/migrations      Skema database
+database/seeders         Data awal role, user, produk, collection, blog, FAQ, dll
+resources/views          Blade untuk user, auth, email, payment, dan admin
+routes/web.php           Semua route web aplikasi
+tests/Feature            Test fitur checkout, Midtrans, order history, admin finance, dll
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi Lokal
 
-## Laravel Sponsors
+1. Clone repository dan masuk ke folder proyek.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone <url-repository>
+cd E-Commerce
+```
 
-### Premium Partners
+2. Install dependency PHP dan JavaScript.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+composer install
+npm install
+```
 
-## Contributing
+3. Buat file environment dan application key.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
+4. Atur `.env`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Contoh minimal untuk SQLite:
 
-## Security Vulnerabilities
+```env
+APP_NAME="Laravel E-Commerce"
+APP_URL=http://127.0.0.1:8000
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/ke/project/database/database.sqlite
 
-## License
+QUEUE_CONNECTION=database
+SESSION_DRIVER=database
+MAIL_MAILER=log
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Jika file SQLite belum ada:
+
+```bash
+touch database/database.sqlite
+```
+
+5. Jalankan migrasi dan seeder.
+
+```bash
+php artisan migrate --seed
+```
+
+6. Buat link storage publik.
+
+```bash
+php artisan storage:link
+```
+
+7. Jalankan aplikasi.
+
+```bash
+php artisan serve
+npm run dev
+```
+
+Aplikasi web berjalan di `http://127.0.0.1:8000`. Vite berjalan terpisah untuk asset development.
+
+## Perintah Alternatif
+
+Laravel script di `composer.json` menyediakan beberapa shortcut:
+
+```bash
+composer run setup
+composer run dev
+composer run test
+npm run build
+```
+
+Catatan: `composer run dev` menjalankan server Laravel, queue listener, log viewer `pail`, dan Vite secara bersamaan menggunakan `concurrently`.
+
+## Akun Seeder
+
+Semua akun seed memakai password:
+
+```text
+password123
+```
+
+| Role | Email |
+| --- | --- |
+| Super Admin | `superadmin@toko.com` |
+| Admin | `admin@toko.com` |
+| Editor | `editor@toko.com` |
+| Finance | `finance@toko.com` |
+| Staff | `staff@toko.com` |
+| Customer | `customer@toko.com` |
+
+Dashboard admin dapat diakses melalui `/dashboard` setelah login sebagai role internal.
+
+## Konfigurasi Midtrans
+
+Tambahkan key berikut di `.env` saat ingin menjalankan pembayaran Midtrans:
+
+```env
+MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxx
+MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxx
+MIDTRANS_IS_PRODUCTION=false
+```
+
+Callback Midtrans diarahkan ke:
+
+```text
+POST /midtrans/callback
+```
+
+Untuk development lokal dengan callback dari Midtrans, gunakan tunnel seperti Ngrok dan set `APP_URL` ke URL publik tunnel tersebut.
+
+## Alur Order dan Stok
+
+- Customer membuat order dari cart atau direct checkout.
+- Order awal memakai status `waiting_admin`.
+- Admin mengisi ongkir, total, dan optional payment URL. Status berubah menjadi `quoted`.
+- Stok dikurangi saat status masuk ke `quoted`, `paid`, `processing`, `shipped`, atau `completed`.
+- Stok dikembalikan saat status kembali ke `waiting_admin`, `pending`, `cancelled`, `failed`, atau `refunded`.
+- Order `shipped` dapat otomatis selesai saat `delivery_estimated_at` sudah lewat ketika halaman status/admin diakses.
+
+Status yang digunakan aplikasi:
+
+```text
+waiting_admin, quoted, pending, challenge, paid, processing, shipped,
+completed, cancelled, failed, refunded
+```
+
+## Route Utama
+
+| Area | Route |
+| --- | --- |
+| Home | `/` |
+| Shop | `/shop` |
+| Detail produk | `/product/{product}` |
+| Category | `/category/{category}` |
+| Collection | `/collection/{collection}` |
+| Blog | `/post` dan `/post/{slug}` |
+| Search | `/search` |
+| Login | `/login` |
+| Register | `/register` |
+| Account | `/account` |
+| Cart | `/cart` |
+| Wishlist | `/wishlist` |
+| Checkout | `/checkout` |
+| Order customer | `/orders` |
+| Status pembayaran | `/payments/{orderCode}/status` |
+| Dashboard admin | `/dashboard` |
+| Admin resources | `/admin/...` |
+| Finance | `/admin/finance` |
+
+## Role dan Permission
+
+Definisi role dan permission ada di `config/admin_permissions.php`.
+
+- `superadmin`: semua permission, termasuk role access dan performance team.
+- `admin`: mayoritas modul operasional, produk, konten, order, finance, dan user.
+- `editor`: produk, kategori, collection, blog, dan storefront.
+- `finance`: order dan finance.
+- `staff`: order dan storefront.
+- `user`: akses storefront/customer.
+
+Jalankan ulang seeder role jika ada perubahan permission:
+
+```bash
+php artisan db:seed --class=RoleSeeder
+```
+
+## File Upload dan Storage
+
+Aplikasi menyimpan gambar produk, kategori, collection, blog thumbnail, display, banner login, material, size guide, dan foto komplain ke disk `public`.
+
+Pastikan symlink storage aktif:
+
+```bash
+php artisan storage:link
+```
+
+URL file publik menggunakan pola:
+
+```text
+/storage/{path-file}
+```
+
+## Email dan Queue
+
+Notifikasi yang tersedia:
+
+- Verifikasi email custom.
+- Email order dibuat.
+- Email link pembayaran setelah admin melakukan quote.
+- Reset password.
+
+Default `.env.example` memakai:
+
+```env
+MAIL_MAILER=log
+QUEUE_CONNECTION=database
+```
+
+Untuk memproses queue database secara lokal:
+
+```bash
+php artisan queue:listen --tries=1 --timeout=0
+```
+
+## Testing
+
+Jalankan seluruh test:
+
+```bash
+php artisan test
+```
+
+Atau lewat composer script:
+
+```bash
+composer run test
+```
+
+Konfigurasi test memakai SQLite in-memory, mail array, queue sync, cache array, dan session array dari `phpunit.xml`.
+
+## Build Production
+
+Contoh langkah build sebelum deploy:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm install
+npm run build
+php artisan migrate --force
+php artisan storage:link
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Pastikan environment production memakai nilai yang sesuai:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://domain-produksi
+MIDTRANS_IS_PRODUCTION=true
+```
+
+## Catatan Data Awal
+
+Seeder menyiapkan data dasar untuk demo dan pengembangan:
+
+- Role, permission, dan user awal.
+- Kategori produk, collection, atribut produk, size guide, produk, gambar SVG placeholder, dan varian stok.
+- Konten about, FAQ, progress step return/how-to-buy, care guide, crash replacement, social link, blog, customer order, dan activity log.
+
+Setelah `php artisan migrate --seed`, aplikasi sudah bisa diuji dari sisi customer maupun admin.

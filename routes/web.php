@@ -26,6 +26,7 @@ use App\Http\Controllers\MainController\OrderHistoryController;
 use App\Http\Controllers\Admin\OrderComplaintController as AdminOrderComplaintController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PerformanceController;
 use App\Http\Controllers\Admin\RoleAccessController;
@@ -157,6 +158,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
 
             Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+            Route::middleware('role:superadmin|admin')
+                ->prefix('error-logs')
+                ->name('error-logs.')
+                ->group(function () {
+                    Route::get('/', [ErrorLogController::class, 'index'])->name('index');
+                    Route::get('/download', [ErrorLogController::class, 'download'])->name('download');
+                });
 
             Route::middleware('role:superadmin|admin|finance')
                 ->prefix('finance')

@@ -358,6 +358,13 @@
             ],
         ],
         [
+            'label' => 'Error Logs',
+            'icon' => 'bi bi-bug',
+            'route' => 'admin.error-logs.index',
+            'active' => ['admin.error-logs.*'],
+            'roles' => ['superadmin', 'admin'],
+        ],
+        [
             'label' => 'Blog',
             'icon' => 'bi bi-journal',
             'permission' => 'manage blogs',
