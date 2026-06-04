@@ -32,7 +32,7 @@ class LandingpageController extends Controller
                 ->where('is_active', true)
                 ->with(['images', 'variants'])
                 ->latest()
-                ->limit(3)])
+                ->limit(5)])
             ->withCount(['products as active_products_count' => fn ($query) => $query->where('is_active', true)])
             ->whereHas('products', fn ($query) => $query->where('is_active', true))
             ->orderByDesc('active_products_count')
