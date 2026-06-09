@@ -16,7 +16,7 @@
                 <h3 class="text-lg font-bold uppercase tracking-widest mb-4 border-b-4 border-black inline-block pb-1">Profile Settings</h3>
                 <ul class="space-y-4 mt-4 text-sm text-gray-700 font-medium">
                     <li><a href="#" class="text-black font-bold">Profile</a></li>
-                    <li><a href="/password/email" class="hover:text-[#c4a052] transition">Change Password</a></li>
+                    <li><a href="/password/reset" class="hover:text-[#c4a052] transition">Change Password</a></li>
                     <li><a href="#" class="hover:text-[#c4a052] transition">Manage Payments</a></li>
                     <li><a href="#" class="hover:text-red-600 transition">Delete Account</a></li>
                     <li class="pt-4">

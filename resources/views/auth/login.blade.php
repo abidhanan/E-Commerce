@@ -1,108 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+<x-layouts.app>
+    <div class="pt-32 pb-24 flex justify-center items-center min-h-screen bg-white">
+        <div class="bg-[#fafafa] w-full max-w-md p-10 shadow-sm border border-gray-100">
+            <h2 class="text-3xl font-light tracking-wide mb-1">LOG IN</h2>
+            <div class="w-12 h-1 bg-black mb-8"></div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Account</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/android-chrome-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('images/android-chrome-512x512.png') }}">
-    @include('auth.partials.premium-auth-styles')
-</head>
+            @if ($errors->any())
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <ul class="text-xs text-red-700 list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-<body>
-    <div class="auth-shell">
-        @include('auth.partials.premium-slider')
-
-        <main class="auth-panel">
-            <div class="auth-card">
-                <span class="auth-logo">
-                    <img src="{{ asset('images/logo.png') }}" alt="E-Store">
-                </span>
-
-
-                <h1 class="auth-title">Welcome Back</h1>
-                <p class="auth-subtitle">Sign in to manage catalog, orders, content, and brand operations from one
-                    premium workspace.</p>
-
-                <div class="auth-tabs">
-                    <button class="auth-tab active" type="button">Login</button>
-                    <button class="auth-tab" type="button" onclick="authNavigate('{{ route('register') }}')">Create
-                        Account</button>
+            <form method="POST" action="/login" class="space-y-6">
+                @csrf
+                
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Email</label>
+                    <input type="email" name="email" required autofocus class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                 </div>
 
-                @if (session('message'))
-                    <div class="alert-success">{{ session('message') }}</div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert-error">{{ session('error') }}</div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert-error">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="email">Email</label>
-                        <input id="email" type="email" name="email"
-                            class="auth-input @error('email') is-invalid @enderror" value="{{ old('email') }}"
-                            placeholder="name@example.com" autocomplete="email" required autofocus>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="password">Password</label>
-                        <div class="auth-input-wrap">
-                            <input id="password" type="password" name="password"
-                                class="auth-input has-toggle @error('password') is-invalid @enderror"
-                                placeholder="Enter your password" autocomplete="current-password" required>
-                            <button type="button" class="password-toggle" data-password-toggle="password">Show</button>
-                        </div>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-row">
-                        <label class="auth-check" for="remember">
-                            <input type="checkbox" name="remember" id="remember">
-                            <span>Remember me</span>
-                        </label>
-
-                        <button type="button" class="auth-link"
-                            onclick="authNavigate('{{ route('password.request') }}')">
-                            Forgot password?
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password-input" name="password" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black focus:ring-0 transition">
+                        
+                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-3.5 text-gray-600 hover:text-black focus:outline-none">
+                            <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
                         </button>
                     </div>
-
-                    <button type="submit" class="submit-btn">Login</button>
-                </form>
-
-                <div class="form-footer">
-                    Don't have an account?
-                    <button type="button" onclick="authNavigate('{{ route('register') }}')">Create one</button>
+                    <div class="mt-2 text-left">
+                        <a href="{{ route('password.request') }}" class="text-[#c4a052] text-xs font-semibold hover:underline">Forgot Password</a>
+                    </div>
                 </div>
+
+                <button type="submit" class="w-full bg-black text-white font-bold tracking-widest uppercase py-4 mt-4 hover:bg-gray-800 transition duration-300">
+                    LOG IN
+                </button>
+            </form>
+
+            <div class="mt-6 text-sm text-gray-800">
+                Don't have an account? <a href="{{ route('register') }}" class="text-[#c4a052] font-semibold hover:underline">Create Account</a>
             </div>
-        </main>
+        </div>
     </div>
 
-    @include('auth.partials.premium-auth-scripts')
-</body>
-
-</html>
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password-input');
+            const icon = document.getElementById('eye-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+            }
+        }
+    </script>
+</x-layouts.app>

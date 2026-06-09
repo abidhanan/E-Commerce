@@ -115,6 +115,17 @@ class AccountController extends Controller
         ]);
     }
 
+    public function verifyPassword(Request $request)
+    {
+        $request->validate(['current_password' => 'required']);
+
+        if (!\Hash::check($request->current_password, $request->user()->password)) {
+            return response()->json(['success' => false, 'message' => 'Password salah.'], 422);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     private function validateAddress(Request $request): array
     {
         return $request->validate([

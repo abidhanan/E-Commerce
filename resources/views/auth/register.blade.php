@@ -1,139 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
+<x-layouts.app>
+    <div class="pt-32 pb-24 flex justify-center items-center min-h-screen bg-white">
+        <div class="bg-[#fafafa] w-full max-w-xl p-10 shadow-sm border border-gray-100">
+            <h2 class="text-3xl font-light tracking-wide mb-1">CREATE ACCOUNT</h2>
+            <div class="w-12 h-1 bg-black mb-8"></div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Account</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/android-chrome-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('images/android-chrome-512x512.png') }}">
-    @include('auth.partials.premium-auth-styles')
-</head>
+            @if ($errors->any())
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <ul class="text-xs text-red-700 list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-<body>
-    <div class="auth-shell">
-        @include('auth.partials.premium-slider')
-
-        <main class="auth-panel">
-            <div class="auth-card auth-card--register">
-                <span class="auth-logo">
-                    <img src="{{ asset('images/logo.png') }}" alt="E-Store">
-                </span>
-
-                <h1 class="auth-title">Create Your Account</h1>
-                <p class="auth-subtitle">Create a secure account to access the same premium workspace experience.</p>
-
-                <div class="auth-tabs">
-                    <button class="auth-tab" type="button"
-                        onclick="authNavigate('{{ route('login') }}')">Login</button>
-                    <button class="auth-tab active" type="button">Create Account</button>
+            <form method="POST" action="{{ route('register') }}" class="space-y-5">
+                @csrf
+                
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Full Name</label>
+                    <input type="text" name="name" value="{{ old('name') }}" required autofocus class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                 </div>
 
-                @if ($errors->any())
-                    <div class="alert-error">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('register') }}" data-disable-on-submit
-                    data-loading-text="Creating Account...">
-                    @csrf
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="name">Name</label>
-                        <input id="name" type="text" name="name"
-                            class="auth-input @error('name') is-invalid @enderror" value="{{ old('name') }}"
-                            placeholder="Your full name" autocomplete="name" required autofocus>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="email">Email</label>
-                        <input id="email" type="email" name="email"
-                            class="auth-input @error('email') is-invalid @enderror" value="{{ old('email') }}"
-                            placeholder="name@example.com" autocomplete="email" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="password">Password</label>
-                        <div class="auth-input-wrap">
-                            <input id="password" type="password" name="password"
-                                class="auth-input has-toggle @error('password') is-invalid @enderror"
-                                placeholder="Create a password" autocomplete="new-password" required>
-                            <button type="button" class="password-toggle" data-password-toggle="password">Show</button>
-                        </div>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="password_confirmation">Confirm Password</label>
-                        <div class="auth-input-wrap">
-                            <input id="password_confirmation" type="password" name="password_confirmation"
-                                class="auth-input has-toggle" placeholder="Confirm your password"
-                                autocomplete="new-password" required>
-                            <button type="button" class="password-toggle"
-                                data-password-toggle="password_confirmation">Show</button>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-wrap">
-                        <label class="checkbox-group" for="agree_terms">
-                            <input type="checkbox" id="agree_terms" name="agree_terms" onchange="checkboxCheck()">
-                            <span>
-                                I agree to the
-                                <a href="{{ route('legal.show', 'terms-privacy') }}" class="auth-link"
-                                    target="_blank" rel="noopener">terms and conditions and privacy policy</a>
-                                *
-                            </span>
-                        </label>
-                        <label class="checkbox-group" for="subscribe_newsletter">
-                            <input type="checkbox" id="subscribe_newsletter" name="subscribe_newsletter"
-                                onchange="checkboxCheck()">
-                            <span>
-                                Subscribe to
-                                <a href="{{ route('legal.show', 'newsletter-offers') }}" class="auth-link"
-                                    target="_blank" rel="noopener">newsletter for exclusive updates and offers</a>
-                                *
-                            </span>
-                        </label>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submit-btn" disabled>Create Account</button>
-                </form>
-
-                <div class="form-footer">
-                    Already have an account?
-                    <button type="button" onclick="authNavigate('{{ route('login') }}')">Login</button>
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                 </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Phone Number</label>
+                    <div class="flex gap-2">
+                        <select name="country_code" class="bg-[#f0f0f0] border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-black transition">
+                            <option value="+62" {{ old('country_code') == '+62' ? 'selected' : '' }}>+62 (ID)</option>
+                            </select>
+                        <input type="text" name="phone" value="{{ old('phone') }}" required placeholder="81234567890" class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold tracking-wide uppercase mb-2">Gender</label>
+                        <select name="gender" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                            <option value="" disabled {{ old('gender') ? '' : 'selected' }}>Select</option>
+                            <option value="pria" {{ old('gender') == 'pria' ? 'selected' : '' }}>Pria</option>
+                            <option value="wanita" {{ old('gender') == 'wanita' ? 'selected' : '' }}>Wanita</option>
+                            <option value="unisex" {{ old('gender') == 'unisex' ? 'selected' : '' }}>Unisex</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold tracking-wide uppercase mb-2">Date of Birth</label>
+                        <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition uppercase">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Password</label>
+                    <input type="password" name="password" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Confirm Password</label>
+                    <input type="password" name="password_confirmation" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white font-bold tracking-widest uppercase py-4 mt-6 hover:bg-gray-800 transition duration-300">
+                    CREATE ACCOUNT
+                </button>
+            </form>
+
+            <div class="mt-6 text-sm text-gray-800 text-center">
+                Already have an account? <a href="{{ route('login') }}" class="text-[#c4a052] font-semibold hover:underline">Log In</a>
             </div>
-        </main>
+        </div>
     </div>
-
-    @include('auth.partials.premium-auth-scripts')
-    <script>
-        function checkboxCheck() {
-            const terms = document.getElementById('agree_terms').checked;
-            const subscribe = document.getElementById('subscribe_newsletter').checked;
-            const button = document.getElementById('submit-btn');
-            button.disabled = !(terms && subscribe);
-        }
-    </script>
-    @include('Shared.disable-submit-script')
-</body>
-
-</html>
+</x-layouts.app>

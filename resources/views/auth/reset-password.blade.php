@@ -1,97 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
+<x-layouts.app>
+    <div class="pt-32 pb-24 flex justify-center items-center min-h-[70vh] bg-white">
+        <div class="w-full max-w-lg px-6">
+            
+            <h2 class="text-3xl font-normal tracking-wide mb-2 uppercase">Reset Password</h2>
+            <div class="w-16 h-1 bg-black mb-10"></div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - Account</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/android-chrome-192x192.png') }}">
-    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('images/android-chrome-512x512.png') }}">
-    @include('auth.partials.premium-auth-styles')
-</head>
-
-<body>
-    <div class="auth-shell">
-        @include('auth.partials.premium-slider')
-
-        <main class="auth-panel">
-            <div class="auth-card">
-                <span class="auth-logo">
-                    <img src="{{ asset('images/logo.png') }}" alt="E-Store">
-                </span>
-
-                <span class="auth-brand-kicker">Secure Recovery</span>
-                <h1 class="auth-title">Create New Password</h1>
-                <p class="auth-subtitle">Choose a new password to restore access to your premium admin account.</p>
-
-                @if (session('status'))
-                    <div class="alert-success">{{ session('status') }}</div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert-error">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('password.update') }}">
-                    @csrf
-                    <input type="hidden" name="token" value="{{ $token }}">
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="email">Email</label>
-                        <input id="email" type="email" name="email"
-                            class="auth-input @error('email') is-invalid @enderror" value="{{ old('email', $email) }}"
-                            placeholder="name@example.com" autocomplete="email" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="password">New Password</label>
-                        <div class="auth-input-wrap">
-                            <input id="password" type="password" name="password"
-                                class="auth-input has-toggle @error('password') is-invalid @enderror"
-                                placeholder="Enter a new password" autocomplete="new-password" required>
-                            <button type="button" class="password-toggle" data-password-toggle="password">Show</button>
-                        </div>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="auth-group">
-                        <label class="auth-label" for="password_confirmation">Confirm New Password</label>
-                        <div class="auth-input-wrap">
-                            <input id="password_confirmation" type="password" name="password_confirmation"
-                                class="auth-input has-toggle" placeholder="Confirm your new password"
-                                autocomplete="new-password" required>
-                            <button type="button" class="password-toggle"
-                                data-password-toggle="password_confirmation">Show</button>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Reset Password</button>
-                </form>
-
-                <div class="form-footer">
-                    Remember your password?
-                    <button type="button" onclick="authNavigate('{{ route('login') }}')">Back to login</button>
+            @if (session('status'))
+                <div class="bg-green-50 text-green-800 p-4 mb-6 border-l-4 border-green-500 text-sm">
+                    {{ session('status') }}
                 </div>
-            </div>
-        </main>
+            @endif
+
+            @if ($errors->any())
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <ul class="text-xs text-red-700 list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
+                @csrf
+
+                <input type="hidden" name="token" value="{{ $token }}">
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Email Address</label>
+                    <input type="email" name="email" value="{{ $email }}" readonly class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-4 text-sm focus:outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">New Password</label>
+                    <input type="password" name="password" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-4 text-sm focus:outline-none focus:border-black transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide uppercase mb-2">Confirm New Password</label>
+                    <input type="password" name="password_confirmation" required class="w-full bg-[#f0f0f0] border border-gray-300 px-4 py-4 text-sm focus:outline-none focus:border-black transition">
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white font-bold tracking-widest uppercase py-4 mt-6 hover:bg-gray-800 transition duration-300">
+                    RESET PASSWORD
+                </button>
+            </form>
+
+        </div>
     </div>
-
-    @include('auth.partials.premium-auth-scripts')
-</body>
-
-</html>
+</x-layouts.app>

@@ -146,6 +146,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
     Route::put('/account', [AccountController::class, 'update'])->name('account.update');
 
+    Route::post('/account/verify-password', [App\Http\Controllers\MainController\AccountController::class, 'verifyPassword'])->name('account.verify-password');
+
     Route::middleware(['role:superadmin|admin|editor|finance|staff', 'admin.activity'])
         ->prefix('admin')
         ->name('admin.')
