@@ -38,32 +38,22 @@
                 
             </a>
 
-            <div class="relative group">
-                <a href="/cart" class="flex items-center space-x-2 px-5 py-2 rounded-full hover:bg-black hover:text-white transition-all duration-300 relative z-10">
+           <div class="relative flex items-center">
+                <button onclick="toggleCart()" class="flex items-center space-x-2 px-5 py-2 rounded-full hover:bg-black hover:text-white transition-all duration-300 relative focus:outline-none cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                </a>
-
-                <div class="absolute top-full right-0 w-full h-4 bg-transparent z-40"></div>
-
-                <div class="absolute right-0 top-full mt-2 w-80 bg-white shadow-2xl border border-gray-100 rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top-right translate-y-2 group-hover:translate-y-0 p-8 text-center cursor-default">
                     
-                    <div class="w-32 h-32 bg-gray-50 rounded-full mx-auto flex items-center justify-center mb-6 relative">
-                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                        <svg class="w-5 h-5 text-gray-300 absolute top-2 left-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6 4.8 2.4 7.6-6.4-4.8-6.4 4.8 2.4-7.6-6-4.8h7.6z"/></svg>
-                        <svg class="w-4 h-4 text-gray-400 absolute bottom-4 right-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.6H22l-6 4.8 2.4 7.6-6.4-4.8-6.4 4.8 2.4-7.6-6-4.8h7.6z"/></svg>
-                    </div>
+                    <!-- Logika Backend Injeksi Langsung -->
+                    @php
+                        // Cek apakah pengguna sudah login. Jika ya, jumlahkan 'qty' dari relasi cartItems mereka. Jika belum, 0.
+                        $initialCartCount = auth()->check() ? auth()->user()->cartItems()->sum('qty') : 0;
+                    @endphp
 
-                    <h3 class="text-sm font-bold text-gray-900 mb-2">Your Bag is empty.</h3>
-                    <p class="text-xs text-gray-500 mb-6">Start filling it up with your favourites.</p>
-
-                    <a href="/" class="block w-full bg-[#222] hover:bg-black text-white text-xs font-bold uppercase tracking-wider py-4 rounded-xl transition-colors">
-                        See what's new
-                    </a>
-                </div>
+                    <span id="navbar-cart-count" class="absolute top-0 right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
+                        {{ $initialCartCount }}
+                    </span>
+                </button>
             </div>
 
         </div>
@@ -184,7 +174,7 @@
             </div>
 
             <div class="group">
-                <a href="#" class="pb-4 hover:text-[#c4a052] border-b-2 border-transparent hover:border-[#c4a052] transition cursor-pointer">Accessories</a>
+                <a href="#" class="pb-4 hover:text-[#c4a052] border-b-2 border-transparent hover:border-[#c4a052] transition cursor-pointer">Unisex</a>
                     <div class="absolute left-0 top-full w-full bg-gradient-to-b from-[#fdfbf6] to-white shadow-2xl border-t border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                         <div class="max-w-screen-lg mx-auto px-6 py-12 grid grid-cols-4 gap-8 text-center">
                             

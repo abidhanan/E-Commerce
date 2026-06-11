@@ -11,13 +11,16 @@ class WishlistController extends Controller
 {
     public function index()
     {
-        $products = Auth::user()
-            ->wishlistProducts()
-            ->with(['images', 'variants'])
-            ->latest('wishlists.created_at')
+        abort_unless(auth()->check(), 401);
+
+        // Relasi yang benar sesuai dengan User.php milikmu adalah 'wishlists'
+        $wishlists = auth()->user()
+            ->wishlists() 
+            ->with(['product.variants', 'product.images', 'product.category', 'product.collection'])
+            ->latest()
             ->get();
 
-        return view('Users.wishlist.index', compact('products'));
+        return view('Users.wishlist.index', compact('wishlists'));
     }
 
     public function status(): JsonResponse

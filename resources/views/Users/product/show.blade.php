@@ -96,17 +96,16 @@
                     <div id="display-price" class="text-3xl text-gray-900 font-medium">Rp {{ number_format($basePrice, 0, ',', '.') }}</div>
                 </div>
 
-                <form action="{{ route('cart.store') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <input type="hidden" name="variant_id" id="selected-variant-id" value="">
+                <form id="add-to-cart-form" class="space-y-4">
+                    <input type="hidden" id="selected-variant-id" value="">
                     
                     <div class="flex space-x-3">
                         <div class="flex items-center border border-gray-300 px-4 py-3 flex-shrink-0">
                             <button type="button" onclick="document.getElementById('qty').stepDown()" class="font-bold text-lg">&minus;</button>
-                            <input type="number" name="quantity" id="qty" value="1" min="1" class="w-12 text-center bg-transparent border-none text-sm font-bold focus:ring-0" readonly>
+                            <input type="number" name="qty" id="qty" value="1" min="1" class="w-12 text-center bg-transparent border-none text-sm font-bold focus:ring-0" readonly>
                             <button type="button" onclick="document.getElementById('qty').stepUp()" class="font-bold text-lg">&plus;</button>
                         </div>
-                        <button type="submit" id="add-to-cart-btn" class="flex-1 bg-black text-white text-[12px] font-bold tracking-widest uppercase py-4 hover:bg-gray-800 transition" disabled>
+                        <button type="submit" id="add-to-cart-btn" class="flex-1 bg-black text-white text-[12px] font-bold tracking-widest uppercase py-4 hover:bg-gray-800 transition disabled:opacity-50" disabled>
                             PILIH UKURAN DULU
                         </button>
                     </div>
@@ -174,5 +173,80 @@
             addToCartBtn.disabled = false;
             addToCartBtn.innerText = 'ADD TO CART';
         }
+
+            // Mencegat tombol Submit "ADD TO CART"
+        document.getElementById('add-to-cart-form').addEventListener('submit', async function(e) {
+            // 1. KUNCI UTAMA: Cegah browser melakukan reload halaman
+            e.preventDefault(); 
+
+            const btn = document.getElementById('add-to-cart-btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'ADDING...';
+            btn.disabled = true;
+
+            const variantId = document.getElementById('selected-variant-id').value;
+            const qty = document.getElementById('qty').value;
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            try {
+                // Tembak data ke backend
+                const response = await fetch("{{ route('cart.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({
+                        variant_id: variantId,
+                        qty: qty
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.message || 'Gagal menambahkan produk ke keranjang.');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // ==========================================
+                // TITIK EKSEKUSI MUTLAK (Memaksa UI Berubah)
+                // ==========================================
+
+                // 1. Paksa ubah angka di Navbar secara instan detik itu juga
+                const navBadge = document.getElementById('navbar-cart-count');
+                if (navBadge) {
+                    navBadge.innerText = data.count; // Mengambil total dari JSON backend Ela
+                }
+
+                // 2. Paksa buka Sidebar Cart (Memanggil otak sidebar secara langsung)
+                if (typeof window.toggleCart === 'function') {
+                    const cartSidebar = document.getElementById('cart-sidebar');
+                    if (cartSidebar && cartSidebar.classList.contains('translate-x-full')) {
+                        window.toggleCart(); // Buka laci & otomatis muat data terbaru
+                    } else if (typeof window.fetchCart === 'function') {
+                        window.fetchCart(); // Jika laci sudah terbuka, cukup refresh datanya
+                    }
+                } else {
+                    console.warn('Sistem gagal menemukan fungsi toggleCart. Pastikan file cart-sidebar.blade.php sudah di-include di app.blade.php.');
+                }
+
+                // 3. Kembalikan kondisi tombol
+                btn.innerText = 'ADDED TO CART!';
+                setTimeout(() => {
+                    btn.innerText = 'ADD TO CART';
+                    btn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error('Terjadi kesalahan sistem:', error);
+                alert('Sistem gagal terhubung ke server. Tekan F12 dan cek tab Console.');
+                btn.innerText = 'ERROR, TRY AGAIN';
+                btn.disabled = false;
+            }
+        });
     </script>
 </x-layouts.app>

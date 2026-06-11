@@ -10,7 +10,6 @@
             </div>
 
             <div class="space-y-6">
-                {{-- Asumsi controller mengirimkan variabel $wishlists yang berisi model Wishlist/Product --}}
                 @forelse($wishlists ?? [] as $item)
                     @php
                         // Menangkap produk dari relasi wishlist
@@ -20,7 +19,7 @@
                         $imagePath = $primaryImage ? asset('storage/' . $primaryImage->image) : asset('images/no-image.jpg');
                     @endphp
 
-                    <div class="flex gap-6 items-start border-b border-gray-200 pb-6 relative group">
+                    <div class="flex gap-6 items-start border-b border-gray-200 pb-6 relative group wishlist-item-row">
                         
                         <a href="{{ route('product.show', $product->slug ?? $product->id) }}" class="w-32 h-40 bg-gray-100 flex-shrink-0">
                             <img src="{{ $imagePath }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
@@ -46,15 +45,14 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('wishlist.destroy', $product->id) }}" method="POST" class="absolute top-0 right-0">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-black hover:text-red-500 transition p-2" title="Hapus dari Wishlist">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.657l-8.828-8.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </form>
+                        <button type="button" 
+                                onclick="removeWishlistRow(this, '{{ route('wishlist.toggle', $product->id) }}')" 
+                                class="absolute top-0 right-0 text-black hover:text-red-500 transition p-2 cursor-pointer" 
+                                title="Hapus dari Wishlist">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.657l-8.828-8.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
                     </div>
                 @empty
                     <div class="text-center py-16">
@@ -67,4 +65,47 @@
 
         </main>
     </div>
+
+    <script>
+        async function removeWishlistRow(btn, url) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            // Mencari elemen berdasarkan kelas absolut, bukan .group
+            const row = btn.closest('.wishlist-item-row');
+            
+            row.style.opacity = '0.4';
+            row.style.pointerEvents = 'none';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    }
+                });
+
+                if (response.ok) {
+                    row.remove();
+                    
+                    // Menghitung sisa elemen secara presisi
+                    const remainingItems = document.querySelectorAll('.wishlist-item-row');
+                    if (remainingItems.length === 0) {
+                        window.location.reload();
+                    }
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'Gagal menghapus produk.');
+                    row.style.opacity = '1';
+                    row.style.pointerEvents = 'auto';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Koneksi terputus.');
+                row.style.opacity = '1';
+                row.style.pointerEvents = 'auto';
+            }
+        }
+    </script>
 </x-layouts.app>
