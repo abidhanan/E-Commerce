@@ -103,10 +103,11 @@
         container.innerHTML = html;
     }
 
+    // Fungsi Update Qty ke CartController@update
     async function updateQty(itemId, newQty) {
         try {
             const response = await fetch(`{{ url('/cart') }}/${itemId}`, {
-                method: 'PUT',
+                method: 'PATCH', // <--- UBAH BAGIAN INI SECARA MUTLAK
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

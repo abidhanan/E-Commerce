@@ -104,33 +104,35 @@ public function verifyEmail(Request $request, $id, $hash)
    
 }
     public function register(Request $request)
-{
-    // 1. Paksa sistem memvalidasi data yang masuk
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255|unique:users,email',
-        'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
-        'phone' => 'required|string|max:20', // Tambahkan validasi telepon
-        'gender' => 'required|string|in:pria,wanita,unisex', // Sesuaikan opsi kelaminmu
-        'date_of_birth' => 'required|date', // Tambahkan validasi tanggal
-    ]);
+    {
+        // 1. Paksa sistem memvalidasi data yang masuk
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
+            'phone' => 'required|string|max:20', 
+            'gender' => 'required|string|in:pria,wanita,unisex', 
+            'date_of_birth' => 'required|date', 
+        ]);
 
-    // 2. Paksa sistem memasukkannya ke database
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'phone' => $request->phone,           // Tangkap data
-        'gender' => $request->gender,         // Tangkap data
-        'date_of_birth' => $request->date_of_birth, // Tangkap data
-    ]);
+        // 2. Paksa sistem memasukkannya ke database
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,           
+            'gender' => $request->gender,         
+            'date_of_birth' => $request->date_of_birth, 
+        ]);
 
-    $user->assignRole('user');
+        $user->assignRole('user');
 
-    $user->sendEmailVerificationNotification();
+        $user->sendEmailVerificationNotification();
 
-    return redirect('/login')->with('message', 'Silakan cek email untuk verifikasi.');
-}
+        Auth::login($user);
+
+        return redirect('/email/verify'); 
+    }
 
 
     public function logout(Request $request)
