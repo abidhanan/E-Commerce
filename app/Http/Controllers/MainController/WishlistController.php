@@ -25,12 +25,15 @@ class WishlistController extends Controller
 
     public function status(): JsonResponse
     {
-        $user = Auth::user();
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['product_ids' => [], 'count' => 0], 401);
+        }
 
         return response()->json([
-            'product_ids' => $user->wishlistProducts()
-                ->pluck('products.id')
-                ->values(),
+            // Pastikan ini mengambil 'product_id' dari relasi 'wishlists'
+            'product_ids' => $user->wishlists()->pluck('product_id')->map(fn($id) => (int) $id)->values(),
             'count' => $user->wishlists()->count(),
         ]);
     }

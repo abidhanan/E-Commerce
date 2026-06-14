@@ -84,5 +84,68 @@
         };
     </script>
 
+    <script>
+    async function synchronizeWishlistUI() {
+        try {
+            // Tambahkan parameter waktu (timestamp) & header no-cache untuk membunuh cache memori browser
+            const response = await fetch("{{ route('wishlist.status') }}?t=" + new Date().getTime(), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
+                }
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            
+            // Konversi mutlak: pastikan semua ID yang datang dipaksa menjadi Integer
+            const wishlistedIds = (data.product_ids || []).map(id => parseInt(id, 10));
+
+            // Update badge angka di keranjang/wishlist jika ada
+            const wishlistCounter = document.getElementById('wishlist-badge-count');
+            if (wishlistCounter) {
+                wishlistCounter.innerText = data.count;
+            }
+
+            // Sapu bersih tombol hati di layar dan cocokkan dengan data peladen
+            document.querySelectorAll('.wishlist-sync-btn').forEach(btn => {
+                const productId = parseInt(btn.getAttribute('data-product-id'), 10);
+                const icon = btn.querySelector('.heart-icon');
+                
+                if (!icon) return;
+
+                if (wishlistedIds.includes(productId)) {
+                    // Barang ada di wishlist -> Nyalakan Hati
+                    icon.setAttribute('fill', 'currentColor');
+                    btn.classList.add('text-red-500');
+                    btn.classList.remove('text-gray-300');
+                } else {
+                    // Barang tidak ada di wishlist -> Matikan Hati
+                    icon.setAttribute('fill', 'none');
+                    btn.classList.remove('text-red-500');
+                    btn.classList.add('text-gray-300');
+                }
+            });
+
+        } catch (error) {
+            console.error('Sinkronisasi wishlist gagal:', error);
+        }
+    }
+
+    // 1. Eksekusi saat halaman pertama kali dimuat
+    document.addEventListener('DOMContentLoaded', synchronizeWishlistUI);
+
+    // 2. Eksekusi saat pengguna menekan tombol "Back" atau "Forward" di Browser
+    window.addEventListener('pageshow', function(event) {
+        // event.persisted bernilai true jika halaman dimuat dari memori (BFCache)
+        if (event.persisted) {
+            synchronizeWishlistUI();
+        }
+    });
+</script>
+
 </body>
 </html>
