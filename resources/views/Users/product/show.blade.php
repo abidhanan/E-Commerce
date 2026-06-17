@@ -80,7 +80,7 @@
                     <div class="flex flex-wrap gap-2">
                         @forelse($product->variants as $variant)
                             <button type="button" 
-                                onclick="selectVariant(this, '{{ $variant->id }}', {{ $variant->price }}, {{ $variant->stock }})"
+                                data-size="{{ $variant->size }}"  onclick="selectVariant(this, '{{ $variant->id }}', {{ $variant->price }}, {{ $variant->stock }})"
                                 class="variant-btn w-12 h-12 border border-black text-xs font-bold bg-white text-black transition hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
                                 {{ $variant->stock <= 0 ? 'disabled' : '' }}
                                 title="Stok: {{ $variant->stock }}">
@@ -117,9 +117,64 @@
                         Add to Wishlist
                     </button>
                 </form>
+            </div> </div> <div class="mt-24 border-t border-gray-200 pt-16">
+            <h2 class="text-2xl font-light tracking-wide uppercase text-gray-900 mb-10">Customer Reviews</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div class="lg:col-span-4">
+                    <h3 class="text-sm font-bold uppercase tracking-widest mb-6">Verified Ratings</h3>
+                    
+                    @php
+                        $reviews = $product->verified_reviews;
+                        $averageRating = $reviews->count() > 0 ? round($reviews->avg('rating'), 1) : 0;
+                    @endphp
+
+                    <div class="bg-gray-50 border border-gray-200 p-8 text-center">
+                        <div class="text-6xl font-light text-black mb-2">{{ number_format($averageRating, 1) }}</div>
+                        <div class="flex justify-center text-[#c4a052] mb-4">
+                            @for($i = 1; $i <= 5; $i++)
+                                <svg class="w-6 h-6 {{ $i <= round($averageRating) ? 'text-[#c4a052]' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            @endfor
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium uppercase tracking-widest">{{ $reviews->count() }} Ulasan Terverifikasi</p>
+                    </div>
+
+                    <p class="text-[10px] text-gray-400 mt-6 leading-relaxed uppercase tracking-widest text-center">
+                        Ulasan hanya dapat diberikan oleh pelanggan yang telah menyelesaikan transaksi produk ini.
+                    </p>
+                </div>
+
+                <div class="lg:col-span-8 space-y-8">
+                    @forelse($reviews as $review)
+                        <div class="border-b border-gray-100 pb-8">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-bold text-gray-900">{{ $review->user->name ?? 'Verified Buyer' }}</h4>
+                                        <span class="bg-green-100 text-green-800 text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-sm">Verified</span>
+                                    </div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{{ $review->created_at->format('d M Y') }}</p>
+                                </div>
+                                <div class="flex items-center bg-black text-white px-2 py-1">
+                                    <span class="text-xs font-bold">{{ $review->rating }}</span>
+                                    <svg class="w-3 h-3 ml-1 text-[#c4a052]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed mt-4">
+                                {{ $review->comment }}
+                            </p>
+                        </div>
+                    @empty
+                        <div class="py-16 text-center border border-gray-100 bg-gray-50 flex flex-col items-center justify-center h-full">
+                            <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Belum ada ulasan</p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
-    </div>
+
+    </div> 
     
     <script>
         // Logika Interaksi Gambar (Zoom)
@@ -248,5 +303,25 @@
                 btn.disabled = false;
             }
         });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Tangkap parameter dari URL (dikirim dari keranjang)
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetSize = urlParams.get('size');
+
+        if (targetSize) {
+            // 2. Cari tombol berdasarkan class 'variant-btn' dan atribut 'data-size'
+            const sizeBtn = document.querySelector(`.variant-btn[data-size="${targetSize}"]`);
+            
+            if (sizeBtn && !sizeBtn.disabled) {
+                // 3. Eksekusi klik seolah-olah pengguna yang menekannya.
+                // Ini akan otomatis memicu fungsi selectVariant() yang sudah kamu buat,
+                // sehingga harga berubah, tombol menghitam, dan form siap dikirim.
+                sizeBtn.click();
+            }
+        }
+    });
     </script>
 </x-layouts.app>

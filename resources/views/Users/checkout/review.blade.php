@@ -5,12 +5,17 @@
             @csrf
             
             <input type="hidden" name="source" value="{{ $source }}">
-            @if($variantId)
+            @if($source === 'buy_now' && isset($variantId))
                 <input type="hidden" name="variant_id" value="{{ $variantId }}">
             @endif
 
+            @if($source === 'cart')
+                @foreach($items as $item)
+                    <input type="hidden" name="selected_items[]" value="{{ $item['id'] ?? $item['variant']->id }}">
+                @endforeach
+            @endif
+
             @php
-                // Mengambil alamat utama untuk ditampilkan di UI
                 $primaryAddress = $addresses->firstWhere('is_primary', true) ?? $addresses->first();
             @endphp
             
@@ -29,7 +34,7 @@
                         <div class="border border-black rounded-xl overflow-hidden">
                             <div class="flex justify-between items-center border-b border-gray-200 px-6 py-4 bg-white">
                                 <span class="font-semibold text-sm">Saved Information</span>
-                                <button type="button" class="text-[#c4a052] font-bold text-sm uppercase tracking-widest hover:underline">Change</button>
+                                <a href="{{ route('account.index') }}" class="text-[#c4a052] font-bold text-sm uppercase tracking-widest hover:underline">Change</a>
                             </div>
                             <div class="p-6 bg-white space-y-4">
                                 <ul class="list-disc list-outside ml-5 space-y-4 text-sm font-medium">
@@ -66,17 +71,17 @@
                     </div>
 
                     <div class="space-y-4">
-                        <label class="flex justify-between items-center border border-black rounded-xl p-5 cursor-pointer bg-white transition">
+                        <label class="shipping-option flex justify-between items-center border border-black rounded-xl p-5 cursor-pointer bg-white transition">
                             <div class="flex items-center gap-4">
-                                <input type="radio" name="shipping_method" value="standard" checked class="w-5 h-5 text-black accent-black bg-gray-100 border-gray-300 focus:ring-black">
+                                <input type="radio" name="shipping_method" value="standard" data-cost="20000" checked class="w-5 h-5 text-black accent-black bg-gray-100 border-gray-300 focus:ring-black">
                                 <span class="font-medium text-sm">Standard Delivery (3-5 days)</span>
                             </div>
                             <span class="font-medium text-sm">Rp 20.000</span>
                         </label>
 
-                        <label class="flex justify-between items-center border border-gray-300 rounded-xl p-5 cursor-pointer hover:border-black bg-white transition">
+                        <label class="shipping-option flex justify-between items-center border border-gray-300 rounded-xl p-5 cursor-pointer hover:border-black bg-white transition">
                             <div class="flex items-center gap-4">
-                                <input type="radio" name="shipping_method" value="express" class="w-5 h-5 text-black accent-black bg-gray-100 border-gray-300 focus:ring-black">
+                                <input type="radio" name="shipping_method" value="express" data-cost="50000" class="w-5 h-5 text-black accent-black bg-gray-100 border-gray-300 focus:ring-black">
                                 <span class="font-medium text-sm">Express Delivery (1-2 days)</span>
                             </div>
                             <span class="font-medium text-sm">Rp 50.000</span>
@@ -91,33 +96,38 @@
                         <h2 class="text-3xl font-normal tracking-wide uppercase">Order Summary</h2>
                     </div>
 
-                    <div class="space-y-6 mb-8">
+                    <div class="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2">
                         @foreach($items as $item)
+                            @php
+                                // Pemetaan Array Asosiatif (Karena controllermu mengirimkan array, bukan objek)
+                                $variant = $item['variant'];
+                                $product = $item['product'];
+                                $qty = $item['qty'];
+                                
+                                // Jika controller tidak mengirimkan line_total, hitung otomatis
+                                $lineTotal = $item['line_total'] ?? ($variant->price * $qty);
+                                
+                                $img = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+                            @endphp
+                            
                             <div class="flex gap-6 items-center">
                                 <div class="w-24 h-28 bg-gray-100 flex-shrink-0">
-                                    @php
-                                        $img = $item['product']->images->firstWhere('is_primary', true) ?? $item['product']->images->first();
-                                    @endphp
                                     <img src="{{ $img ? asset('storage/' . $img->image) : asset('images/no-image.jpg') }}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="flex-grow">
-                                    <h3 class="text-sm font-bold text-gray-900 leading-tight mb-2">{{ $item['product']->name }}</h3>
+                                    <h3 class="text-sm font-bold text-gray-900 leading-tight mb-2">{{ $product->name }}</h3>
                                     
                                     <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-4 h-4 bg-black rounded-full border border-gray-300"></div>
-                                            <span class="text-xs text-gray-500 uppercase tracking-widest">Color: {{ $item['variant']->color ?? 'N/A' }}</span>
-                                        </div>
                                         <div class="bg-black text-white text-[10px] font-bold px-2 py-1 uppercase rounded-sm">
-                                            {{ $item['variant']->size }}
+                                            Size: {{ $variant->size }}
                                         </div>
                                     </div>
 
                                     <div class="flex items-center justify-between mt-4">
                                         <div class="bg-gray-200 text-gray-800 text-xs font-semibold px-4 py-1 rounded-full">
-                                            {{ $item['qty'] }}
+                                            Qty: {{ $qty }}
                                         </div>
-                                        <span class="text-base font-normal italic">Rp {{ number_format($item['line_total'], 0, ',', '.') }}</span>
+                                        <span class="text-base font-normal italic">Rp {{ number_format($lineTotal, 0, ',', '.') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -131,14 +141,14 @@
                         </div>
                         <div class="flex justify-between items-center text-sm font-medium">
                             <span class="text-gray-600">Shipping</span>
-                            <span>Rp 20.000</span> 
+                            <span id="shipping-cost-display">Rp 20.000</span> 
                         </div>
                     </div>
 
                     <div class="border-t border-black mt-4 pt-4 mb-6">
                         <div class="flex justify-between items-center text-xl font-bold">
                             <span>Total</span>
-                            <span>Rp {{ number_format($subtotal + 20000, 0, ',', '.') }}</span>
+                            <span id="total-cost-display">Rp {{ number_format($subtotal + 20000, 0, ',', '.') }}</span>
                         </div>
                     </div>
 
@@ -153,4 +163,37 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const subtotal = {{ $subtotal }};
+            const shippingRadios = document.querySelectorAll('input[name="shipping_method"]');
+            const shippingDisplay = document.getElementById('shipping-cost-display');
+            const totalDisplay = document.getElementById('total-cost-display');
+            const shippingOptions = document.querySelectorAll('.shipping-option');
+
+            function updatePricing(radio) {
+                const shippingCost = parseInt(radio.getAttribute('data-cost'), 10);
+                const grandTotal = subtotal + shippingCost;
+
+                // Update teks di antarmuka
+                shippingDisplay.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(shippingCost);
+                totalDisplay.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(grandTotal);
+
+                // Perbarui estetika label radio button agar jelas mana yang terpilih
+                shippingOptions.forEach(opt => {
+                    opt.classList.remove('border-black');
+                    opt.classList.add('border-gray-300');
+                });
+                radio.closest('.shipping-option').classList.remove('border-gray-300');
+                radio.closest('.shipping-option').classList.add('border-black');
+            }
+
+            shippingRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updatePricing(this);
+                });
+            });
+        });
+    </script>
 </x-layouts.app>

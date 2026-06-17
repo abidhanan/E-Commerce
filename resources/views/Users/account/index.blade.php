@@ -45,13 +45,18 @@
                                     @if(isset($address) && $address)
                                         {{ $address->full_address }}, {{ $address->city }}, {{ $address->province }} {{ $address->postal_code }}, Indonesia
                                     @else
-                                        <span class="italic text-gray-400">Belum ada alamat utama.</span>
+                                        <span class="italic text-gray-400">There is no primary address yet.</span>
                                     @endif
                                 </p>
                             </div>
+                            
                             @if(isset($address) && $address)
-                                <button type="button" onclick="openEditAddressModal({{ $address->id }})" class="text-sm font-bold text-[#c4a052] uppercase tracking-widest hover:underline transition">
+                                <button type="button" onclick="openAddressModal({{ $address->id }})" class="text-sm font-bold text-[#c4a052] uppercase tracking-widest hover:underline transition">
                                     Edit Address
+                                </button>
+                            @else
+                                <button type="button" onclick="openAddressModal()" class="text-sm font-bold text-black uppercase tracking-widest hover:text-[#c4a052] transition border-b border-black hover:border-[#c4a052]">
+                                    + Add Address
                                 </button>
                             @endif
                         </div>
@@ -133,62 +138,62 @@
         </div>
     </div>
 
-    <div id="edit-address-modal" class="fixed inset-0 bg-black/60 z-[110] hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full max-w-2xl p-10 shadow-2xl relative transform scale-95 transition-transform duration-300 h-screen sm:h-auto sm:max-h-[90vh] overflow-y-auto" id="edit-address-content">
+    <div id="address-modal" class="fixed inset-0 bg-black/60 z-[110] hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-2xl p-10 shadow-2xl relative transform scale-95 transition-transform duration-300 h-screen sm:h-auto sm:max-h-[90vh] overflow-y-auto" id="address-content">
             
-            <button type="button" onclick="closeEditAddressModal()" class="absolute top-6 right-6 text-gray-400 hover:text-black transition">
+            <button type="button" onclick="closeAddressModal()" class="absolute top-6 right-6 text-gray-400 hover:text-black transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            <h2 class="text-2xl font-light tracking-wide uppercase mb-8 text-gray-900 border-b border-gray-200 pb-4">Edit Address</h2>
+            <h2 id="modal-address-title" class="text-2xl font-light tracking-wide uppercase mb-8 text-gray-900 border-b border-gray-200 pb-4">Address Management</h2>
 
-            <form id="edit-address-form" class="space-y-6">
-                <input type="hidden" id="edit-address-id">
+            <form id="address-form" class="space-y-6">
+                <input type="hidden" id="form-address-id" value="">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold tracking-wide uppercase mb-2">Label (ex: Rumah/Kantor)</label>
-                        <input type="text" id="edit-addr-label" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                        <input type="text" id="addr-label" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold tracking-wide uppercase mb-2">Recipient Name</label>
-                        <input type="text" id="edit-addr-name" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                        <input type="text" id="addr-name" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold tracking-wide uppercase mb-2">Phone Number</label>
-                        <input type="text" id="edit-addr-phone" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                        <input type="text" id="addr-phone" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold tracking-wide uppercase mb-2">Postal Code</label>
-                        <input type="text" id="edit-addr-postal" class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                        <input type="text" id="addr-postal" class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-bold tracking-wide uppercase mb-2">City</label>
-                        <input type="text" id="edit-addr-city" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                        <input type="text" id="addr-city" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold tracking-wide uppercase mb-2">Province</label>
-                        <input type="text" id="edit-addr-province" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
+                        <input type="text" id="addr-province" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold tracking-wide uppercase mb-2">Full Address</label>
-                    <textarea id="edit-addr-full" rows="3" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition"></textarea>
+                    <textarea id="addr-full" rows="3" required class="w-full bg-gray-50 border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:border-black transition"></textarea>
                 </div>
 
                 <div class="pt-6 flex gap-4">
-                    <button type="button" onclick="closeEditAddressModal()" class="w-1/2 border border-black text-black font-bold tracking-widest uppercase py-4 hover:bg-gray-50 transition-colors duration-300">
+                    <button type="button" onclick="closeAddressModal()" class="w-1/2 border border-black text-black font-bold tracking-widest uppercase py-4 hover:bg-gray-50 transition-colors duration-300">
                         CANCEL
                     </button>
                     <button type="submit" id="btn-save-address" class="w-1/2 bg-black text-white font-bold tracking-widest uppercase py-4 hover:bg-[#c4a052] transition-colors duration-300">
-                        UPDATE ADDRESS
+                        SAVE ADDRESS
                     </button>
                 </div>
             </form>
@@ -219,47 +224,56 @@
             }, 300);
         }
 
-        // --- 2. SCRIPT MODAL ADDRESS ---
-        const addressModal = document.getElementById('edit-address-modal');
-        const addressModalContent = document.getElementById('edit-address-content');
+        // --- 2. SCRIPT MODAL ADDRESS HIBRIDA ---
+        const addressModal = document.getElementById('address-modal');
+        const addressModalContent = document.getElementById('address-content');
         
-        // Proteksi jika token CSRF absen dari layout utama
         let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        if(!csrfToken) {
-            const meta = document.createElement('meta');
-            meta.name = "csrf-token";
-            meta.content = "{{ csrf_token() }}";
-            document.head.appendChild(meta);
-            csrfToken = meta.content;
-        }
 
-        async function openEditAddressModal(addressId) {
+        async function openAddressModal(addressId = null) {
+            // Reset form setiap kali modal dibuka
+            document.getElementById('address-form').reset();
+            document.getElementById('form-address-id').value = '';
+            
+            // Ubah estetika berdasarkan Mode
+            document.getElementById('modal-address-title').innerText = addressId ? 'Edit Address' : 'Add New Address';
+            document.getElementById('btn-save-address').innerText = addressId ? 'UPDATE ADDRESS' : 'SAVE ADDRESS';
+
+            // LOGIKA UX PROFESIONAL: Auto-fill data profil jika ini adalah alamat baru
+            if (!addressId) {
+                document.getElementById('addr-name').value = "{{ auth()->user()->name }}";
+                document.getElementById('addr-phone').value = "{{ auth()->user()->phone ?? '' }}";
+            }
+
             addressModal.classList.remove('hidden');
             setTimeout(() => {
                 addressModal.classList.remove('opacity-0');
                 addressModalContent.classList.remove('scale-95');
             }, 10);
 
-            try {
-                const response = await fetch(`/address/${addressId}`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                
-                document.getElementById('edit-address-id').value = data.id;
-                document.getElementById('edit-addr-label').value = data.label;
-                document.getElementById('edit-addr-name').value = data.recipient_name;
-                document.getElementById('edit-addr-phone').value = data.phone_number;
-                document.getElementById('edit-addr-city').value = data.city;
-                document.getElementById('edit-addr-province').value = data.province;
-                document.getElementById('edit-addr-full').value = data.full_address;
-                document.getElementById('edit-addr-postal').value = data.postal_code || '';
-            } catch (error) {
-                console.error("Gagal mengambil data alamat:", error);
-                alert("Gagal memuat data alamat. Periksa koneksi.");
+            // Jika mode Edit, tarik data lama dari database menimpa auto-fill di atas
+            if (addressId) {
+                try {
+                    const response = await fetch(`/address/${addressId}`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    
+                    document.getElementById('form-address-id').value = data.id;
+                    document.getElementById('addr-label').value = data.label;
+                    document.getElementById('addr-name').value = data.recipient_name;
+                    document.getElementById('addr-phone').value = data.phone_number;
+                    document.getElementById('addr-city').value = data.city;
+                    document.getElementById('addr-province').value = data.province;
+                    document.getElementById('addr-full').value = data.full_address;
+                    document.getElementById('addr-postal').value = data.postal_code || '';
+                } catch (error) {
+                    console.error("Gagal mengambil data:", error);
+                    alert("Gagal memuat data alamat.");
+                }
             }
         }
 
-        function closeEditAddressModal() {
+        function closeAddressModal() {
             addressModal.classList.add('opacity-0');
             addressModalContent.classList.add('scale-95');
             setTimeout(() => {
@@ -267,28 +281,31 @@
             }, 300);
         }
 
-        // --- 3. AJAX SUBMIT ADDRESS ---
-        document.getElementById('edit-address-form').addEventListener('submit', async function(e) {
+        // --- 3. EKSEKUSI DATA ADDRESS ---
+        document.getElementById('address-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const btnSave = document.getElementById('btn-save-address');
-            btnSave.innerHTML = 'SAVING...';
+            btnSave.innerHTML = 'PROCESSING...';
             btnSave.disabled = true;
 
-            const addressId = document.getElementById('edit-address-id').value;
+            const addressId = document.getElementById('form-address-id').value;
             const payload = {
-                label: document.getElementById('edit-addr-label').value,
-                recipient_name: document.getElementById('edit-addr-name').value,
-                phone_number: document.getElementById('edit-addr-phone').value,
-                city: document.getElementById('edit-addr-city').value,
-                province: document.getElementById('edit-addr-province').value,
-                full_address: document.getElementById('edit-addr-full').value,
-                postal_code: document.getElementById('edit-addr-postal').value,
+                label: document.getElementById('addr-label').value,
+                recipient_name: document.getElementById('addr-name').value,
+                phone_number: document.getElementById('addr-phone').value,
+                city: document.getElementById('addr-city').value,
+                province: document.getElementById('addr-province').value,
+                full_address: document.getElementById('addr-full').value,
+                postal_code: document.getElementById('addr-postal').value,
             };
 
+            const url = addressId ? `/address/${addressId}` : `/address`;
+            const method = addressId ? 'PUT' : 'POST';
+
             try {
-                const response = await fetch(`/address/${addressId}`, {
-                    method: 'PUT',
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -300,16 +317,16 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    window.location.reload();
+                    window.location.reload(); 
                 } else {
-                    alert(result.message || 'Gagal memperbarui alamat');
-                    btnSave.innerHTML = 'UPDATE ADDRESS';
+                    alert(result.message || 'Operasi gagal.');
+                    btnSave.innerHTML = addressId ? 'UPDATE ADDRESS' : 'SAVE ADDRESS';
                     btnSave.disabled = false;
                 }
             } catch (error) {
                 console.error(error);
                 alert('Koneksi terputus.');
-                btnSave.innerHTML = 'UPDATE ADDRESS';
+                btnSave.innerHTML = addressId ? 'UPDATE ADDRESS' : 'SAVE ADDRESS';
                 btnSave.disabled = false;
             }
         });

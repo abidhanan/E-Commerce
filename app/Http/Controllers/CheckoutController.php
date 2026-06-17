@@ -51,6 +51,8 @@ class CheckoutController extends Controller
             'variant_id' => ['required_if:source,direct', 'nullable', 'exists:product_variants,id'],
             'address_id' => ['required', 'exists:addresses,id'],
             'customer_note' => ['nullable', 'string', 'max:1000'],
+            'selected_items' => ['required_if:source,cart', 'array'], // KUNCI MUTLAK
+            'selected_items.*' => ['exists:cart_items,id'],
         ]);
 
         $address = $request->user()
@@ -144,8 +146,9 @@ class CheckoutController extends Controller
                 'qty' => $item['qty'],
             ]));
 
+            // HANYA HAPUS BARANG YANG DIBELI, BUKAN SELURUH KERANJANG
             if ($data['source'] === 'cart') {
-                $request->user()->cartItems()->delete();
+                $request->user()->cartItems()->whereIn('id', $data['selected_items'])->delete();
             }
 
             return $order->load(['user', 'address', 'items.product', 'items.productVariant']);
@@ -245,12 +248,20 @@ class CheckoutController extends Controller
 
     private function cartReviewItems(Request $request): array
     {
-        $items = $request->user()
+        $query = $request->user()
             ->cartItems()
             ->with(['productVariant.product.images'])
-            ->latest()
-            ->get()
+            ->latest();
+
+        // TANGKAP PARAMETER DARI URL SIDEBAR CART
+        if ($request->has('items')) {
+            $itemIds = explode(',', $request->input('items'));
+            $query->whereIn('id', $itemIds);
+        }
+
+        $items = $query->get()
             ->map(fn (CartItem $item) => [
+                'id' => $item->id, // INI WAJIB ADA AGAR FRONTEND BISA BACA ID-NYA
                 'product' => $item->productVariant->product,
                 'variant' => $item->productVariant,
                 'qty' => (int) $item->qty,
@@ -289,8 +300,10 @@ class CheckoutController extends Controller
             ]);
         }
 
+        // HANYA TARIK DATA BERDASARKAN CHECKBOX YANG DIPILIH USER
         return $request->user()
             ->cartItems()
+            ->whereIn('id', $data['selected_items'])
             ->get(['product_variant_id', 'qty'])
             ->map(fn (CartItem $item) => [
                 'variant_id' => (int) $item->product_variant_id,

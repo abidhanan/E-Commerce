@@ -7,29 +7,31 @@
 
         <div class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
             <div>
+                <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Services</h4>
+                <ul class="space-y-1 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">How to Buy</a></li>
+                    <li><a href="#" class="hover:text-white transition">Returns</a></li>
+                    <li><a href="#" class="hover:text-white transition">How to Buy</a></li>
+                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                    <li><a href="#" class="hover:text-white transition">Crash Replacement</a></li>
+                    
+                </ul>
+            </div>
+
+            <div>
                 <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Quick Links</h4>
                 <ul class="space-y-1 text-sm text-gray-400">
                     <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                    <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                    <li><a href="#" class="hover:text-white transition">Blog</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Service</h4>
+                <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Official Stores</h4>
                 <ul class="space-y-1 text-sm text-gray-400">
-                    <li><a href="seller/info" class="hover:text-white transition">Sell on Clothique</a></li>
-                    <li><a href="#" class="hover:text-white transition">Track Order</a></li>
-                    <li><a href="#" class="hover:text-white transition">Returns</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Categories</h4>
-                <ul class="space-y-1 text-sm text-gray-400">
-                    <li><a href="#" class="hover:text-white transition">Men</a></li>
-                    <li><a href="#" class="hover:text-white transition">Women</a></li>
-                    <li><a href="#" class="hover:text-white transition">New Arrivals</a></li>
+                    <li><a href="#" class="hover:text-white transition">Shopee</a></li>
+                    <li><a href="#" class="hover:text-white transition">Tokopedia</a></li>
+                    <li><a href="#" class="hover:text-white transition">Lazada</a></li>
                 </ul>
             </div>
         </div>

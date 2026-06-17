@@ -90,4 +90,15 @@ class Product extends Model
 
         return json_last_error() === JSON_ERROR_NONE;
     }
+
+    // ACCESSOR: Menarik ulasan terverifikasi dari OrderReview melalui OrderItem
+    public function getVerifiedReviewsAttribute()
+    {
+        return \App\Models\OrderReview::with('user')
+            ->whereHas('order.items', function ($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->latest()
+            ->get();
+    }
 }

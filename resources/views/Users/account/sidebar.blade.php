@@ -13,18 +13,27 @@
         <ul class="space-y-4 mt-4 text-sm text-gray-700 font-medium">
             <li><a href="{{ url('/account') }}" class="{{ request()->is('account') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition">Profile</a></li>
             <li><a href="{{ url('/password/reset') }}" class="{{ request()->is('password/reset') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition">Change Password</a></li>
-            <li><a href="#" class="hover:text-[#c4a052] transition">Manage Payments</a></li>
-            <li class="pt-4 border-t border-gray-200 mt-4">
+            
+            <li class="pt-6 mt-6 border-t border-gray-200">
+                <a href="{{ url('/') }}" class="flex items-center gap-2 hover:text-[#c4a052] font-bold transition text-gray-900 uppercase tracking-widest text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back to Store
+                </a>
+            </li>
+
+            <li class="pt-4 mt-2">
                 <form id="logout-form" method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="button" onclick="openLogoutModal()" class="hover:text-red-600 font-bold transition text-left w-full uppercase tracking-widest text-sm">
+                    <button type="button" onclick="openLogoutModal()" class="hover:text-red-600 font-bold transition text-left w-full uppercase tracking-widest text-sm text-gray-500">
                         Logout
                     </button>
                 </form>
             </li>
         </ul>
     </div>
-</aside> <div id="logout-modal" class="fixed inset-0 bg-black/60 z-[1000] hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
+</aside> 
+
+<div id="logout-modal" class="fixed inset-0 bg-black/60 z-[1000] hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div class="bg-white w-full max-w-sm p-8 shadow-2xl relative transform scale-95 transition-transform duration-300 text-center" id="logout-modal-content">
         
         <svg class="w-16 h-16 text-red-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>

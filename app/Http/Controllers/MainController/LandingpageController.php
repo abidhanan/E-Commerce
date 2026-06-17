@@ -289,4 +289,52 @@ class LandingpageController extends Controller
         return view('Users.care-guide.index', compact('guides'));
     }
 
+    public function shop(\Illuminate\Http\Request $request)
+    {
+        // 1. Ambil relasi yang dibutuhkan
+        $query = \App\Models\Product::with(['images', 'category', 'variants']);
+
+        // 2. MESIN PENCARIAN MUTLAK (Search Engine)
+        $keyword = $request->input('search');
+        
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                // Cari kecocokan di nama produk
+                $q->where('name', 'like', '%' . $keyword . '%')
+                  // ATAU cari kecocokan di deskripsi produk
+                  ->orWhere('description', 'like', '%' . $keyword . '%')
+                  // ATAU cari produk yang kategorinya cocok dengan kata kunci
+                  ->orWhereHas('category', function ($catQuery) use ($keyword) {
+                      $catQuery->where('name', 'like', '%' . $keyword . '%');
+                  });
+            });
+        }
+
+        // 3. Mesin Pengurutan (Sorting)
+        $sort = $request->input('sort', 'latest');
+        
+        if ($sort === 'price_asc') {
+            $query->orderByRaw("(SELECT MIN(price) FROM product_variants WHERE product_variants.product_id = products.id) ASC");
+        } elseif ($sort === 'price_desc') {
+            $query->orderByRaw("(SELECT MAX(price) FROM product_variants WHERE product_variants.product_id = products.id) DESC");
+        } else {
+            $query->latest();
+        }
+
+        // 4. Eksekusi dengan Paginasi (12 produk per halaman)
+        $products = $query->paginate(12);
+
+        // 5. Dinamika Antarmuka (Ubah judul banner jika sedang melakukan pencarian)
+        $pageTitle = $keyword ? 'Search: ' . $keyword : 'All Products';
+        $pageDescription = $keyword 
+            ? 'Menampilkan hasil pencarian untuk "' . $keyword . '"' 
+            : 'Discover our complete collection of technical apparel.';
+
+        return view('Users.shop.index', [
+            'products' => $products,
+            'pageTitle' => $pageTitle,
+            'pageDescription' => $pageDescription
+        ]);
+    }
+
 }

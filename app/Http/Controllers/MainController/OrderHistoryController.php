@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MainController;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderReview;
 use App\Services\OrderLifecycleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -56,32 +57,51 @@ class OrderHistoryController extends Controller
             ->with('success', 'Pesanan ditandai selesai. Kamu bisa memberi rating atau mengirim komplain jika ada masalah.');
     }
 
-    public function storeReview(Request $request, string $orderCode): RedirectResponse
+    public function storeReview(\Illuminate\Http\Request $request, string $orderCode)
     {
-        $order = $this->findUserOrder($request, $orderCode);
+        // 1. Validasi Input Dasar
+        $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['required', 'string', 'max:1000'],
+        ]);
 
+        // 2. Cari pesanan berdasarkan order_code dan pastikan itu milik user yang sedang login
+        $order = \App\Models\Order::where('order_code', $orderCode)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // 3. Pertahanan Logika 1: Hanya pesanan selesai yang boleh diulas
         if ($order->status !== 'completed') {
-            throw ValidationException::withMessages([
-                'rating' => 'Rating hanya bisa diberikan setelah pesanan selesai.',
+            return back()->with('notify', [
+                'type' => 'error',
+                'title' => 'Ditolak',
+                'message' => 'Anda hanya dapat memberikan ulasan pada pesanan yang sudah selesai.'
             ]);
         }
 
-        $data = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'comment' => ['nullable', 'string', 'max:1000'],
+        // 4. Pertahanan Logika 2: Mencegah ulasan ganda
+        if ($order->review()->exists()) {
+            return back()->with('notify', [
+                'type' => 'error',
+                'title' => 'Ditolak',
+                'message' => 'Pesanan ini sudah memiliki ulasan.'
+            ]);
+        }
+
+        // 5. Eksekusi Penyimpanan
+        \App\Models\OrderReview::create([
+            'order_id' => $order->id,
+            'user_id' => auth()->id(),
+            'rating' => $request->rating,
+            'comment' => $request->comment,
         ]);
 
-        $order->review()->updateOrCreate(
-            ['user_id' => $request->user()->id],
-            [
-                'rating' => $data['rating'],
-                'comment' => $data['comment'] ?? null,
-            ],
-        );
-
-        return redirect()
-            ->route('user.orders.show', $order->order_code)
-            ->with('success', 'Rating pesanan berhasil disimpan.');
+        // 6. Kembalikan pengguna dengan notifikasi sukses
+        return back()->with('notify', [
+            'type' => 'success',
+            'title' => 'Ulasan Berhasil',
+            'message' => 'Terima kasih telah membagikan pengalaman Anda!'
+        ]);
     }
 
     public function storeComplaint(Request $request, string $orderCode): RedirectResponse
