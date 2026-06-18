@@ -39,20 +39,23 @@
                 
                 @forelse($products as $product)
                     @php
-                        // Menarik gambar utama dan harga dasar varian
                         $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
                         $imagePath = $primaryImage ? asset('storage/' . $primaryImage->image) : asset('images/no-image.jpg');
                         $basePrice = $product->variants->min('price') ?? 0;
                     @endphp
 
-                    <div class="group cursor-pointer flex flex-col">
-                        <a href="{{ route('product.show', $product->slug) }}" class="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden mb-4 block">
-                            <img src="{{ $imagePath }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" alt="{{ $product->name }}">
+                    <div class="group flex flex-col">
+                        <div class="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden mb-4">
+                            <x-wishlist-button :product="$product" />
                             
-                            <div class="absolute bottom-0 left-0 w-full bg-black text-white text-center text-xs font-bold tracking-widest uppercase py-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                View Details
-                            </div>
-                        </a>
+                            <a href="{{ route('product.show', $product->slug) }}" class="block w-full h-full">
+                                <img src="{{ $imagePath }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" alt="{{ $product->name }}">
+                                
+                                <div class="absolute bottom-0 left-0 w-full bg-black text-white text-center text-xs font-bold tracking-widest uppercase py-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    View Details
+                                </div>
+                            </a>
+                        </div>
                         
                         <a href="{{ route('product.show', $product->slug) }}" class="text-sm font-bold uppercase tracking-wider text-gray-900 truncate hover:text-[#c4a052] transition">
                             {{ $product->name }}
@@ -64,6 +67,7 @@
                             Rp {{ number_format($basePrice, 0, ',', '.') }}
                         </p>
                     </div>
+
                 @empty
                     <div class="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
                         <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -71,7 +75,6 @@
                         <p class="text-xs mt-2">Tidak ada produk yang sesuai dengan filter atau pencarian Anda.</p>
                     </div>
                 @endforelse
-
             </div>
 
             @if(isset($products) && $products->hasPages())
@@ -80,6 +83,5 @@
                 </div>
             @endif
         </div>
-
     </div>
 </x-layouts.app>

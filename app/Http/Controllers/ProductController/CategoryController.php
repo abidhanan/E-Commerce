@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CategoryProduct as Category;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -29,59 +30,86 @@ class CategoryController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('Admin.Categories.create',compact('categories'));
+        // Hitung slot yang terpakai
+        $featuredCount = Category::where('is_featured_home', true)->count();
+        
+        return view('Admin.Categories.create', compact('categories', 'featuredCount'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'=>'required',
-            'img' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+            'name' => 'required',
+            'img'  => 'required|image|mimes:jpg,jpeg,png|max:2048'
         ]);
+
+        // PERTAHANAN MUTLAK: Hitung slot yang tersedia sebelum menyimpan
+        if ($request->has('is_featured_home')) {
+            $featuredCount = Category::where('is_featured_home', true)->count();
+            if ($featuredCount >= 3) {
+                return back()
+                    ->withErrors(['is_featured_home' => 'Slot Beranda Penuh! Maksimal hanya 3 kategori yang boleh ditampilkan. Copot centang pada kategori lain terlebih dahulu di tabel.'])
+                    ->withInput(); // Mengembalikan input agar admin tidak perlu mengetik ulang nama & parent
+            }
+        }
 
         Category::create([
-            'name'=>$request->name,
-            'img' => $request->file('img')->store('categories', 'public'),
-            'slug'=>Str::slug($request->name).'-'.time(),
-            'parent_id'=>$request->parent_id
+            'name' => $request->name,
+            'img'  => $request->file('img')->store('categories', 'public'),
+            'slug' => Str::slug($request->name) . '-' . time(),
+            'parent_id' => $request->parent_id,
+            'is_featured_home' => $request->has('is_featured_home') 
         ]);
 
-        return redirect()->route('admin.categories.index');
+        return redirect()->route('admin.categories.index')
+            ->with('success', 'Kategori berhasil dibuat.');
     }
 
     public function edit(Category $category)
     {
-        $categories = Category::where('id','!=',$category->id)->get();
-        return view('Admin.Categories.edit',compact('category','categories'));
+        $categories = Category::where('id', '!=', $category->id)->get();
+        // Hitung slot yang terpakai
+        $featuredCount = Category::where('is_featured_home', true)->count();
+        
+        return view('Admin.Categories.edit', compact('category', 'categories', 'featuredCount'));
     }
 
-  public function update(Request $request, Category $category)
-{
-    $request->validate([
-        'name' => 'required',
-        'img' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
-    ]);
+    public function update(Request $request, Category $category)
+    {
+        $request->validate([
+            'name' => 'required',
+            'img'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
 
-    $data = [
-        'name' => $request->name,
-        'slug' => Str::slug($request->name).'-'.time(),
-        'parent_id' => $request->parent_id
-    ];
-
-    if ($request->hasFile('img')) {
-
-        // hapus gambar lama
-        if ($category->img && Storage::disk('public')->exists($category->img)) {
-            Storage::disk('public')->delete($category->img);
+        // PERTAHANAN UPDATE CERDAS
+        // Hanya cegat JIKA kategori ini sebelumnya TIDAK TAYANG, lalu admin ingin MENAYANGKANNYA
+        if ($request->has('is_featured_home') && !$category->is_featured_home) {
+            $featuredCount = Category::where('is_featured_home', true)->count();
+            if ($featuredCount >= 3) {
+                return back()
+                    ->withErrors(['is_featured_home' => 'Slot Beranda Penuh! Maksimal hanya 3 kategori yang boleh ditampilkan. Copot centang pada kategori lain terlebih dahulu.'])
+                    ->withInput();
+            }
         }
 
-        $data['img'] = $request->file('img')->store('categories', 'public');
+        $data = [
+            'name' => $request->name,
+            'parent_id' => $request->parent_id,
+            'is_featured_home' => $request->has('is_featured_home') 
+        ];
+
+        if ($request->hasFile('img')) {
+            if ($category->img && Storage::disk('public')->exists($category->img)) {
+                Storage::disk('public')->delete($category->img);
+            }
+            $data['img'] = $request->file('img')->store('categories', 'public');
+        }
+
+        $category->update($data);
+
+        return redirect()->route('admin.categories.index')
+            ->with('success', 'Kategori berhasil diperbarui.');
     }
-
-    $category->update($data);
-
-    return redirect()->route('admin.categories.index');
-}
 
     public function destroy(Category $category)
     {

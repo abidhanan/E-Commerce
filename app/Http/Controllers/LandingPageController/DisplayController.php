@@ -6,19 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Display;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Product;
+
 class DisplayController extends Controller
 {
     public function index()
     {
-        $displays = Display::latest()->get();
+        // Menggunakan paginate agar dasbor tidak meledak jika admin iseng membuat ratusan display
+        $displays = Display::latest()->paginate(10);
         return view('Admin.displays.index', compact('displays'));
     }
 
     public function create()
     {
-        $products = Product::all();
-        return view('Admin.displays.create', compact('products'));
+        // Panggilan Product::all() yang membuang memori telah dimusnahkan.
+        return view('Admin.displays.create');
     }
 
     public function store(Request $request)
@@ -37,16 +38,14 @@ class DisplayController extends Controller
         Display::create($data);
 
         return redirect()->route('admin.displays.index')
-            ->with('success', 'Display berhasil dibuat');
+            ->with('success', 'Display berhasil dibuat. Banner terbaru otomatis tayang di halaman utama.');
     }
 
     public function edit(Display $display)
     {
-        $products = Product::all();
-        return view('Admin.displays.create', compact('display', 'products'));
+        // Diubah menjadi view 'edit' agar tidak tumpang tindih dengan form 'create'
+        return view('Admin.displays.edit', compact('display'));
     }
-    
-    
 
     public function update(Request $request, Display $display)
     {
@@ -56,16 +55,15 @@ class DisplayController extends Controller
             $field = "image_{$i}_path";
 
             if ($request->hasFile($field)) {
-
-                // DELETE OLD FILE
-                if ($display->$field && Storage::disk('public')->exists($display->$field)) {
+                // DELETE OLD FILE (Pertahanan ketat agar tidak error jika path kosong)
+                if (!empty($display->$field) && Storage::disk('public')->exists($display->$field)) {
                     Storage::disk('public')->delete($display->$field);
                 }
 
                 // STORE NEW FILE
                 $data[$field] = $request->file($field)->store('displays', 'public');
             } else {
-                // KEEP OLD FILE
+                // KEEP OLD FILE (Menghapus dari array $data agar update() tidak menimpanya menjadi null)
                 unset($data[$field]);
             }
         }
@@ -73,16 +71,16 @@ class DisplayController extends Controller
         $display->update($data);
 
         return redirect()->route('admin.displays.index')
-            ->with('success', 'Display berhasil diupdate');
+            ->with('success', 'Display berhasil diperbarui.');
     }
 
     public function destroy(Display $display)
     {
-        // DELETE ALL IMAGES
+        // DELETE ALL IMAGES FROM STORAGE SEBELUM MENGHAPUS ROW
         for ($i = 1; $i <= 3; $i++) {
             $field = "image_{$i}_path";
 
-            if ($display->$field && Storage::disk('public')->exists($display->$field)) {
+            if (!empty($display->$field) && Storage::disk('public')->exists($display->$field)) {
                 Storage::disk('public')->delete($display->$field);
             }
         }
@@ -90,31 +88,28 @@ class DisplayController extends Controller
         $display->delete();
 
         return redirect()->route('admin.displays.index')
-            ->with('success', 'Display berhasil dihapus');
+            ->with('success', 'Display berhasil dihapus dari sistem.');
     }
 
     /**
-     * VALIDATION LOGIC
+     * VALIDATION LOGIC MUTLAK
      */
     private function validateData(Request $request)
     {
         return $request->validate([
-            // IMAGE
-            'image_1_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'image_2_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'image_3_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            // Kapasitas dinaikkan menjadi 3MB (3072) dan mendukung webp untuk performa web modern
+            'image_1_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'image_2_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'image_3_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
 
-            // TITLE
             'image_1_title' => 'nullable|string|max:255',
             'image_2_title' => 'nullable|string|max:255',
             'image_3_title' => 'nullable|string|max:255',
 
-            // SUB TITLE (ONLY IMAGE 1)
             'image_1_sub_title' => 'nullable|string|max:255',
             'image_2_sub_title' => 'nullable|string|max:255',
             'image_3_sub_title' => 'nullable|string|max:255',
 
-            // RUNNING TEXT
             'running_text' => 'nullable|string',
         ]);
     }

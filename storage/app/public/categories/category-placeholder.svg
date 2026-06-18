@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 960" fill="none">
-  <rect width="960" height="960" rx="56" fill="#0F172A"/>
-  <rect x="72" y="72" width="816" height="816" rx="40" fill="#E2E8F0"/>
-  <circle cx="742" cy="240" r="122" fill="#94A3B8"/>
-  <path d="M170 636c70-148 214-240 378-240 93 0 181 30 252 82v182H170V636Z" fill="#334155"/>
-  <text x="144" y="196" fill="#0F172A" font-size="54" font-family="Arial, sans-serif" font-weight="700">PRODUCT CATEGORY</text>
-  <text x="144" y="256" fill="#475569" font-size="28" font-family="Arial, sans-serif">Placeholder image for catalog navigation.</text>
-</svg>

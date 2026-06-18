@@ -1,6 +1,6 @@
 <x-layouts.app>
     
-    <x-hero-banner />
+    <x-hero-banner :displays="$displays" />
 
     <!-- 1 -->
     <section class="max-w-screen-xl mx-auto px-6 pb-20 -mt-24 md:-mt-32 relative z-20">
@@ -9,7 +9,7 @@
             @forelse($categories->take(3) as $category)
                 <a href="{{ route('category.show', $category->slug) }}" class="relative group cursor-pointer border-4 border-white shadow-xl overflow-hidden bg-gray-100 aspect-[3/4] md:aspect-auto md:h-[400px] block">
                     
-                    <img src="{{ asset('storage/' . $category->image) }}" 
+                    <img src="{{ asset('storage/' . $category->img) }}" 
                          onerror="this.src='https://images.unsplash.com/photo-1642886512785-b5fee9faad7f?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'" 
                          class="w-full h-full object-cover group-hover:scale-105 transition duration-700" 
                          alt="{{ $category->name }}">

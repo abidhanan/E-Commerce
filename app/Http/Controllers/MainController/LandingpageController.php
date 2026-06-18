@@ -28,15 +28,13 @@ class LandingpageController extends Controller
     public function index()
     {
     $categories = CategoryProduct::query()
+            ->where('is_featured_home', true) // KUNCI MUTLAK: Hanya yang dicentang admin
             ->with(['products' => fn ($query) => $query
                 ->where('is_active', true)
                 ->with(['images', 'variants'])
                 ->latest()
                 ->limit(5)])
-            ->withCount(['products as active_products_count' => fn ($query) => $query->where('is_active', true)])
-            ->whereHas('products', fn ($query) => $query->where('is_active', true))
-            ->orderByDesc('active_products_count')
-            ->orderBy('name')
+            ->take(3) // Batasi maksimal 3 agar UI tidak rusak
             ->get();
 
     $collections = Collections::query()

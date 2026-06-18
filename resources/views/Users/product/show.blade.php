@@ -70,11 +70,13 @@
                 </h2>
 
                 <div class="mb-8">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Pilih Ukuran</span>
-                        @if($product->sizeGuide)
-                            <a href="#" class="text-[10px] underline text-gray-400">Size Guide</a>
-                        @endif
+                    <div class="flex flex-col mb-3">
+                        <div class="flex justify-between items-center w-full">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Pilih Ukuran</span>
+                            @if($product->sizeGuide)
+                                <a href="#" class="text-[10px] underline text-gray-400">Size Guide</a>
+                            @endif
+                        </div>
                     </div>
                     
                     <div class="flex flex-wrap gap-2">
@@ -111,13 +113,30 @@
                     </div>
                 </form>
                 
-                <form action="{{ route('wishlist.toggle', $product->id) }}" method="POST" class="mt-4">
+                @php
+                    // Proteksi Radar: Membaca status di database server secara real-time
+                    $inWishlist = auth()->check() && \Illuminate\Support\Facades\DB::table('wishlists')
+                        ->where('user_id', auth()->id())
+                        ->where('product_id', $product->id)
+                        ->exists();
+                @endphp
+
+                <form id="wishlist-form" action="{{ route('wishlist.toggle', $product->id) }}" method="POST" class="mt-4">
                     @csrf
-                    <button type="submit" class="w-full border border-black text-[10px] font-bold tracking-widest uppercase py-4 hover:bg-gray-50 transition">
-                        Add to Wishlist
-                    </button>
+                    @if(!auth()->check())
+                        <a href="{{ route('login') }}" class="block text-center w-full border border-black text-[10px] font-bold tracking-widest uppercase py-4 hover:bg-gray-50 transition">
+                            Login to Add to Wishlist
+                        </a>
+                    @else
+                        <button type="submit" id="wishlist-btn" class="w-full border border-black text-[10px] font-bold tracking-widest uppercase py-4 transition {{ $inWishlist ? 'bg-black text-white hover:bg-gray-800' : 'bg-transparent text-black hover:bg-gray-50' }}">
+                            {{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
+                        </button>
+                    @endif
                 </form>
-            </div> </div> <div class="mt-24 border-t border-gray-200 pt-16">
+            </div> 
+        </div> 
+
+        <div class="mt-24 border-t border-gray-200 pt-16">
             <h2 class="text-2xl font-light tracking-wide uppercase text-gray-900 mb-10">Customer Reviews</h2>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -125,7 +144,7 @@
                     <h3 class="text-sm font-bold uppercase tracking-widest mb-6">Verified Ratings</h3>
                     
                     @php
-                        $reviews = $product->verified_reviews;
+                        $reviews = $product->verified_reviews ?? collect();
                         $averageRating = $reviews->count() > 0 ? round($reviews->avg('rating'), 1) : 0;
                     @endphp
 
@@ -173,11 +192,9 @@
                 </div>
             </div>
         </div>
-
     </div> 
     
     <script>
-        // Logika Interaksi Gambar (Zoom)
         function zoomImage(e, container) {
             const img = container.querySelector('img');
             const rect = container.getBoundingClientRect();
@@ -191,7 +208,6 @@
             img.style.transformOrigin = 'center center';
         }
 
-        // Logika Pergantian Thumbnail
         function changeMainImage(btn) {
             const newSrc = btn.querySelector('img').src;
             document.getElementById('main-product-image').src = newSrc;
@@ -204,34 +220,25 @@
             btn.classList.add('border-black');
         }
 
-        // Logika Eksekusi Varian (Harga & Formulir)
         function selectVariant(btn, variantId, variantPrice, variantStock) {
-            // 1. Masukkan ID ke dalam form agar bisa masuk cart
             document.getElementById('selected-variant-id').value = variantId;
-
-            // 2. Ubah tampilan harga sesuai ukuran yang diklik
             document.getElementById('display-price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(variantPrice);
 
-            // 3. Reset warna semua tombol ukuran
             const buttons = document.querySelectorAll('.variant-btn');
             buttons.forEach(b => {
                 b.classList.remove('bg-black', 'text-white');
                 b.classList.add('bg-white', 'text-black');
             });
 
-            // 4. Hitamkan tombol yang sedang dipilih
             btn.classList.remove('bg-white', 'text-black');
             btn.classList.add('bg-black', 'text-white');
 
-            // 5. Hidupkan tombol Cart
             const addToCartBtn = document.getElementById('add-to-cart-btn');
             addToCartBtn.disabled = false;
             addToCartBtn.innerText = 'ADD TO CART';
         }
 
-            // Mencegat tombol Submit "ADD TO CART"
         document.getElementById('add-to-cart-form').addEventListener('submit', async function(e) {
-            // 1. KUNCI UTAMA: Cegah browser melakukan reload halaman
             e.preventDefault(); 
 
             const btn = document.getElementById('add-to-cart-btn');
@@ -244,7 +251,6 @@
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             try {
-                // Tembak data ke backend
                 const response = await fetch("{{ route('cart.store') }}", {
                     method: 'POST',
                     headers: {
@@ -252,10 +258,7 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
-                    body: JSON.stringify({
-                        variant_id: variantId,
-                        qty: qty
-                    })
+                    body: JSON.stringify({ variant_id: variantId, qty: qty })
                 });
 
                 const data = await response.json();
@@ -267,29 +270,18 @@
                     return;
                 }
 
-                // ==========================================
-                // TITIK EKSEKUSI MUTLAK (Memaksa UI Berubah)
-                // ==========================================
-
-                // 1. Paksa ubah angka di Navbar secara instan detik itu juga
                 const navBadge = document.getElementById('navbar-cart-count');
-                if (navBadge) {
-                    navBadge.innerText = data.count; // Mengambil total dari JSON backend Ela
-                }
+                if (navBadge) { navBadge.innerText = data.count; }
 
-                // 2. Paksa buka Sidebar Cart (Memanggil otak sidebar secara langsung)
                 if (typeof window.toggleCart === 'function') {
                     const cartSidebar = document.getElementById('cart-sidebar');
                     if (cartSidebar && cartSidebar.classList.contains('translate-x-full')) {
-                        window.toggleCart(); // Buka laci & otomatis muat data terbaru
+                        window.toggleCart(); 
                     } else if (typeof window.fetchCart === 'function') {
-                        window.fetchCart(); // Jika laci sudah terbuka, cukup refresh datanya
+                        window.fetchCart(); 
                     }
-                } else {
-                    console.warn('Sistem gagal menemukan fungsi toggleCart. Pastikan file cart-sidebar.blade.php sudah di-include di app.blade.php.');
                 }
 
-                // 3. Kembalikan kondisi tombol
                 btn.innerText = 'ADDED TO CART!';
                 setTimeout(() => {
                     btn.innerText = 'ADD TO CART';
@@ -298,7 +290,7 @@
 
             } catch (error) {
                 console.error('Terjadi kesalahan sistem:', error);
-                alert('Sistem gagal terhubung ke server. Tekan F12 dan cek tab Console.');
+                alert('Sistem gagal terhubung ke server.');
                 btn.innerText = 'ERROR, TRY AGAIN';
                 btn.disabled = false;
             }
@@ -306,22 +298,74 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 1. Tangkap parameter dari URL (dikirim dari keranjang)
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetSize = urlParams.get('size');
-
-        if (targetSize) {
-            // 2. Cari tombol berdasarkan class 'variant-btn' dan atribut 'data-size'
-            const sizeBtn = document.querySelector(`.variant-btn[data-size="${targetSize}"]`);
+        document.addEventListener('DOMContentLoaded', function() {
+            const wishlistForm = document.getElementById('wishlist-form');
             
-            if (sizeBtn && !sizeBtn.disabled) {
-                // 3. Eksekusi klik seolah-olah pengguna yang menekannya.
-                // Ini akan otomatis memicu fungsi selectVariant() yang sudah kamu buat,
-                // sehingga harga berubah, tombol menghitam, dan form siap dikirim.
-                sizeBtn.click();
+            if (wishlistForm) {
+                wishlistForm.addEventListener('submit', async function(e) {
+                    // Mencegat reload halaman standar HTML
+                    e.preventDefault();
+
+                    const btn = document.getElementById('wishlist-btn');
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    const url = this.action;
+
+                    // Kunci tombol saat transaksi berlangsung demi mencegah spam click
+                    btn.disabled = true;
+                    const originalText = btn.innerText;
+                    btn.innerText = 'PROCESSING...';
+
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': token
+                            }
+                        });
+
+                        // Gerbang Keamanan Otentikasi: Jika session mati di tengah jalan
+                        if (response.status === 401) {
+                            window.location.href = "{{ route('login') }}";
+                            return;
+                        }
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            alert(data.message || 'Gagal mengeksekusi Wishlist.');
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                            return;
+                        }
+
+                        // MUTASI VISUAL: Merestrukturisasi Tailwind CSS secara instan tanpa reload
+                        if (data.status === 'added') {
+                            btn.className = "w-full border border-black text-[10px] font-bold tracking-widest uppercase py-4 transition bg-black text-white hover:bg-gray-800";
+                            btn.innerText = 'Remove from Wishlist';
+                        } else {
+                            btn.className = "w-full border border-black text-[10px] font-bold tracking-widest uppercase py-4 transition bg-transparent text-black hover:bg-gray-50";
+                            btn.innerText = 'Add to Wishlist';
+                        }
+
+                    } catch (error) {
+                        console.error('Wishlist System Failure:', error);
+                        alert('Gagal terhubung ke peladen. Pastikan konfigurasi jaringan aman.');
+                        btn.innerText = originalText;
+                    } finally {
+                        btn.disabled = false;
+                    }
+                });
             }
-        }
-    });
+
+            // Otomasi Seleksi Ukuran Berdasarkan URL (Dari halaman Cart)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetSize = urlParams.get('size');
+            if (targetSize) {
+                const sizeBtn = document.querySelector(`.variant-btn[data-size="${targetSize}"]`);
+                if (sizeBtn && !sizeBtn.disabled) { sizeBtn.click(); }
+            }
+        });
     </script>
 </x-layouts.app>

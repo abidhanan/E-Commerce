@@ -147,5 +147,107 @@
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ambil SEMUA form kartu produk yang ada di layar
+        const cardForms = document.querySelectorAll('.wishlist-card-form');
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        cardForms.forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Cegat reload
+
+                // Cari tombol dan ikon spesifik HANYA di dalam kartu yang sedang diklik
+                const btn = this.querySelector('button[type="submit"]');
+                const icon = this.querySelector('.wishlist-icon');
+                const url = this.action;
+
+                if (!btn || !icon) return;
+
+                btn.disabled = true;
+                // Opsional: Efek denyut saat loading
+                icon.classList.add('animate-pulse');
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': token
+                        }
+                    });
+
+                    if (response.status === 401) {
+                        window.location.href = "{{ route('login') }}";
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        console.error(data.message);
+                        return;
+                    }
+
+                    // MUTASI VISUAL KARTU
+                    if (data.status === 'added') {
+                        icon.classList.remove('text-gray-400', 'fill-transparent');
+                        icon.classList.add('text-red-500', 'fill-red-500');
+                    } else {
+                        icon.classList.remove('text-red-500', 'fill-red-500');
+                        icon.classList.add('text-gray-400', 'fill-transparent');
+                    }
+
+                } catch (error) {
+                    console.error('Sistem Gagal:', error);
+                } finally {
+                    btn.disabled = false;
+                    icon.classList.remove('animate-pulse');
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.onclick = async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const url = this.getAttribute('data-url');
+            const icon = this.querySelector('.heart-icon');
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token
+                    }
+                });
+
+                if (response.status === 401) { window.location.href = "{{ route('login') }}"; return; }
+
+                const data = await response.json();
+                if (data.status === 'added') {
+                    this.classList.replace('text-gray-300', 'text-red-500');
+                    icon.setAttribute('fill', 'currentColor');
+                } else {
+                    this.classList.replace('text-red-500', 'text-gray-300');
+                    icon.setAttribute('fill', 'none');
+                }
+            } catch (err) {
+                console.error("Gagal update wishlist:", err);
+            }
+        };
+    });
+});
+</script>
+
 </body>
 </html>

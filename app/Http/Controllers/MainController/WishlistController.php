@@ -5,7 +5,9 @@ namespace App\Http\Controllers\MainController;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;         // KUNCI MUTLAK REQUEST YANG HILANG
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class WishlistController extends Controller
 {
@@ -38,32 +40,42 @@ class WishlistController extends Controller
         ]);
     }
 
-    public function toggle(Product $product): JsonResponse
+    // JANGAN LUPA TAMBAHKAN 'Request $request' DI DALAM PARAMETER
+    public function toggle(Request $request, Product $product)
     {
         $user = Auth::user();
-        $wishlist = $user->wishlists()
+
+        $wishlist = DB::table('wishlists')
+            ->where('user_id', $user->id)
             ->where('product_id', $product->id)
             ->first();
 
         if ($wishlist) {
-            $wishlist->delete();
+            DB::table('wishlists')->where('id', $wishlist->id)->delete();
+            $status = 'removed';
+            $message = 'Produk dihapus dari Wishlist.';
+        } else {
+            DB::table('wishlists')->insert([
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $status = 'added';
+            $message = 'Produk ditambahkan ke Wishlist.';
+        }
 
+        // KUNCI MUTLAK AJAX: Deteksi jika ini adalah permintaan dari JavaScript
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
-                'wishlisted' => false,
-                'count' => $user->wishlists()->count(),
-                'message' => 'Produk dihapus dari wishlist.',
+                'success' => true,
+                'status' => $status,
+                'message' => $message
             ]);
         }
 
-        $user->wishlists()->create([
-            'product_id' => $product->id,
-        ]);
-
-        return response()->json([
-            'wishlisted' => true,
-            'count' => $user->wishlists()->count(),
-            'message' => 'Produk ditambahkan ke wishlist.',
-        ]);
+        // Fallback jika diklik secara manual tanpa JavaScript
+        return back()->with('success', $message);
     }
 
     public function destroy(Product $product): JsonResponse
