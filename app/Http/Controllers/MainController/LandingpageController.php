@@ -27,7 +27,7 @@ class LandingpageController extends Controller
 {
     public function index()
     {
-    $categories = CategoryProduct::query()
+        $categories = CategoryProduct::query()
             ->where('is_featured_home', true) // KUNCI MUTLAK: Hanya yang dicentang admin
             ->with(['products' => fn ($query) => $query
                 ->where('is_active', true)
@@ -37,7 +37,7 @@ class LandingpageController extends Controller
             ->take(3) // Batasi maksimal 3 agar UI tidak rusak
             ->get();
 
-    $collections = Collections::query()
+        $collections = Collections::query()
             ->with(['products' => fn ($query) => $query
                 ->where('is_active', true)
                 ->with(['images', 'variants'])
@@ -74,18 +74,28 @@ class LandingpageController extends Controller
             ->orderByDesc('active_products_count')
             ->orderBy('id')
             ->get();
+            
         $customCollectionsname = $customCollections->pluck('collection.name')->first() ?? 'Custom Collection';
+        
+        // ====================================================================
+        // EKSTRAKSI MUTLAK: Ambil model model Collections pertama dari relasi
+        // ====================================================================
+        $featuredCollection = $customCollections->first()?->collection;
+
         $displays = Display::latest()->first();
+        
         $bestsellers = BestSellers::with('product.images', 'product.variants')
             ->orderBy('position')
             ->get()
             ->pluck('product');
+            
         $posts = Post::with(['category'])
-        ->where('status', 'published')
+            ->where('status', 'published')
             ->latest()
             ->take(3)
             ->get();
 
+        // Menyuntikkan 'featuredCollection' ke dalam antarmuka dashboard
         return view('Users.dashboard.index', compact(
             'categories',
             'collections',
@@ -95,6 +105,7 @@ class LandingpageController extends Controller
             'customCollectionsname',
             'bestsellers',
             'newArrivalIds',
+            'featuredCollection', // Pipa data tersambung sempurna ke depan!
         ));
     }
     
@@ -263,21 +274,22 @@ class LandingpageController extends Controller
         ->orderBy('step_order')
         ->get();
 
-    $currentStep = 2; // contoh current active step (dynamic dari order/user nanti)
+        $currentStep = 2; 
 
-    return view('users.return-policy.index', compact('steps', 'currentStep'));
+        return view('users.return-policy.index', compact('steps', 'currentStep'));
     }
+    
     public function howToBuy()
     {
         $steps = ProgressStep::where('module', 'how_to_buy_module')
         ->where('is_active', true)
         ->orderBy('step_order')
         ->get();
-    $currentStep = 1; // contoh current active step (dynamic dari order/user nanti)
-    return view('users.how-to-buy.index', compact('steps', 'currentStep'));
+        $currentStep = 1; 
+        return view('users.how-to-buy.index', compact('steps', 'currentStep'));
     }
 
-     public function careGuide()
+    public function careGuide()
     {
         $guides = CareGuide::query()
             ->where('is_active', true)
@@ -289,26 +301,20 @@ class LandingpageController extends Controller
 
     public function shop(\Illuminate\Http\Request $request)
     {
-        // 1. Ambil relasi yang dibutuhkan
         $query = \App\Models\Product::with(['images', 'category', 'variants']);
 
-        // 2. MESIN PENCARIAN MUTLAK (Search Engine)
         $keyword = $request->input('search');
         
         if (!empty($keyword)) {
             $query->where(function ($q) use ($keyword) {
-                // Cari kecocokan di nama produk
                 $q->where('name', 'like', '%' . $keyword . '%')
-                  // ATAU cari kecocokan di deskripsi produk
                   ->orWhere('description', 'like', '%' . $keyword . '%')
-                  // ATAU cari produk yang kategorinya cocok dengan kata kunci
                   ->orWhereHas('category', function ($catQuery) use ($keyword) {
                       $catQuery->where('name', 'like', '%' . $keyword . '%');
                   });
             });
         }
 
-        // 3. Mesin Pengurutan (Sorting)
         $sort = $request->input('sort', 'latest');
         
         if ($sort === 'price_asc') {
@@ -319,10 +325,8 @@ class LandingpageController extends Controller
             $query->latest();
         }
 
-        // 4. Eksekusi dengan Paginasi (12 produk per halaman)
         $products = $query->paginate(12);
 
-        // 5. Dinamika Antarmuka (Ubah judul banner jika sedang melakukan pencarian)
         $pageTitle = $keyword ? 'Search: ' . $keyword : 'All Products';
         $pageDescription = $keyword 
             ? 'Menampilkan hasil pencarian untuk "' . $keyword . '"' 
@@ -334,5 +338,4 @@ class LandingpageController extends Controller
             'pageDescription' => $pageDescription
         ]);
     }
-
 }

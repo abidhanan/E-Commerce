@@ -12,14 +12,27 @@ class AccountController extends Controller
     public function index()
     {
         $user = Auth::user();
+        
         $addresses = $user->addresses()
             ->orderByDesc('is_primary')
             ->orderByDesc('id')
             ->get();
-        $display = DisplayLogin::inRandomOrder()->get();
+            
+        $display = \App\Models\DisplayLogin::inRandomOrder()->get();
         $address = $addresses->firstWhere('is_primary', true) ?? $addresses->first();
 
-        return view('Users.account.index', compact('user', 'address', 'addresses','display'));
+        // =========================================================
+        // Kueri Mutlak: Tarik ulasan user beserta relasi produknya
+        // =========================================================
+        $reviews = \App\Models\OrderReview::query()
+            ->with(['order.items.product' => function($query) {
+                $query->with(['images' => fn($q) => $q->where('is_primary', true)]);
+            }, 'order.items.productVariant'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        return view('Users.account.index', compact('user', 'address', 'addresses', 'display', 'reviews'));
     }
 
     public function update(Request $request)

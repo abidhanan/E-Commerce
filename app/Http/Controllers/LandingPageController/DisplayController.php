@@ -18,7 +18,6 @@ class DisplayController extends Controller
 
     public function create()
     {
-        // Panggilan Product::all() yang membuang memori telah dimusnahkan.
         return view('Admin.displays.create');
     }
 
@@ -26,9 +25,13 @@ class DisplayController extends Controller
     {
         $data = $this->validateData($request);
 
-        // HANDLE UPLOAD IMAGE
+        // HANDLE UPLOAD IMAGE & SAKELAR AKTIF
         for ($i = 1; $i <= 3; $i++) {
             $field = "image_{$i}_path";
+            $activeField = "image_{$i}_is_active";
+
+            // MENANGKAP STATUS CHECKBOX DARI FORMULIR ADMIN
+            $data[$activeField] = $request->has($activeField);
 
             if ($request->hasFile($field)) {
                 $data[$field] = $request->file($field)->store('displays', 'public');
@@ -43,7 +46,6 @@ class DisplayController extends Controller
 
     public function edit(Display $display)
     {
-        // Diubah menjadi view 'edit' agar tidak tumpang tindih dengan form 'create'
         return view('Admin.displays.edit', compact('display'));
     }
 
@@ -53,6 +55,10 @@ class DisplayController extends Controller
 
         for ($i = 1; $i <= 3; $i++) {
             $field = "image_{$i}_path";
+            $activeField = "image_{$i}_is_active";
+
+            // MENANGKAP STATUS CHECKBOX DARI FORMULIR ADMIN
+            $data[$activeField] = $request->has($activeField);
 
             if ($request->hasFile($field)) {
                 // DELETE OLD FILE (Pertahanan ketat agar tidak error jika path kosong)
@@ -97,7 +103,6 @@ class DisplayController extends Controller
     private function validateData(Request $request)
     {
         return $request->validate([
-            // Kapasitas dinaikkan menjadi 3MB (3072) dan mendukung webp untuk performa web modern
             'image_1_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'image_2_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'image_3_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
@@ -109,6 +114,15 @@ class DisplayController extends Controller
             'image_1_sub_title' => 'nullable|string|max:255',
             'image_2_sub_title' => 'nullable|string|max:255',
             'image_3_sub_title' => 'nullable|string|max:255',
+
+            'image_1_link' => 'nullable|url|max:255',
+            'image_2_link' => 'nullable|url|max:255',
+            'image_3_link' => 'nullable|url|max:255',
+
+            // Validasi keberadaan input checkbox dari panel admin
+            'image_1_is_active' => 'nullable',
+            'image_2_is_active' => 'nullable',
+            'image_3_is_active' => 'nullable',
 
             'running_text' => 'nullable|string',
         ]);

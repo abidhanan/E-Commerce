@@ -300,4 +300,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:staff')->get('/order', fn() => "Halaman Order");
     Route::middleware('role:user')->get('/profile', fn() => "Halaman Profile");
 
+    Route::put('/account/reviews/{id}', [\App\Http\Controllers\MainController\UserReviewController::class, 'update'])->name('user.reviews.update');
+    Route::delete('/account/reviews/{id}', [\App\Http\Controllers\MainController\UserReviewController::class, 'destroy'])->name('user.reviews.destroy');
 });

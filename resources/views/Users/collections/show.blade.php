@@ -1,1 +1,95 @@
-@include('Users.__json', ['__userJsonView' => 'Users.collections.show'])
+<x-layouts.app>
+    <div class="pb-20">
+        
+        <div class="relative w-full h-[40vh] md:h-[50vh] bg-gray-900 overflow-hidden">
+            {{-- Gambar dinamis dari database koleksi, jika kosong paksa pakai fallback unsplash --}}
+            <img src="{{ $collection->img ? asset('storage/' . $collection->img) : 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80&w=2000' }}" 
+                 onerror="this.src='https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80&w=2000'" 
+                 class="w-full h-full object-cover filter brightness-50" 
+                 alt="{{ $collection->name }}">
+            
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">
+                <h1 class="text-4xl md:text-6xl font-light tracking-[0.2em] uppercase mb-4">
+                    {{ $collection->name }}
+                </h1>
+                <p class="text-xs md:text-sm font-medium tracking-widest uppercase text-gray-300 max-w-2xl">
+                    Discover our curated technical apparel from the elite "{{ $collection->name }}" series.
+                </p>
+            </div>
+        </div>
+
+        <div class="max-w-screen-xl mx-auto px-6 mt-12 flex justify-between items-center border-b border-gray-200 pb-4">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500">
+                Showing <span class="text-black font-extrabold">{{ $products->total() }}</span> products in this series
+            </h2>
+            
+            {{-- Form Sortir terhubung ke Engine Subquery di CollectionsController --}}
+            <form method="GET" action="{{ url()->current() }}" class="flex items-center">
+                <select name="sort" onchange="this.form.submit()" class="text-xs font-bold uppercase tracking-widest border-none bg-transparent focus:ring-0 cursor-pointer text-right outline-none">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>New Arrivals</option>
+                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                </select>
+            </form>
+        </div>
+
+        <div class="max-w-screen-xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+                
+                @forelse($products as $product)
+                    @php
+                        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+                        $imagePath = $primaryImage ? asset('storage/' . $primaryImage->image) : asset('images/no-image.jpg');
+                        $basePrice = $product->variants->min('price') ?? 0;
+                    @endphp
+
+                    <div class="group flex flex-col">
+                        {{-- PEMBUNGKUS MEDIA RELATIF --}}
+                        <div class="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden mb-4">
+                            
+                            {{-- KOMPONEN WISHLIST BUTTON (Otomatis Diikat AJAX Global di Layout) --}}
+                            <x-wishlist-button :product="$product" />
+                            
+                            <a href="{{ route('product.show', $product->slug) }}" class="block w-full h-full">
+                                <img src="{{ $imagePath }}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" alt="{{ $product->name }}">
+                                
+                                <div class="absolute bottom-0 left-0 w-full bg-black text-white text-center text-xs font-bold tracking-widest uppercase py-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    View Details
+                                </div>
+                            </a>
+                        </div>
+                        
+                        {{-- METADATA PRODUK --}}
+                        <a href="{{ route('product.show', $product->slug) }}" class="text-sm font-bold uppercase tracking-wider text-gray-900 truncate hover:text-[#c4a052] transition">
+                            {{ $product->name }}
+                        </a>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">
+                            {{ $product->category->name ?? 'Gear' }}
+                        </p>
+                        <p class="text-sm font-bold mt-2 text-gray-900">
+                            Rp {{ number_format($basePrice, 0, ',', '.') }}
+                        </p>
+                    </div>
+
+                @empty
+                    {{-- EMPTY STATE JIKA KOLEKSI BELUM BERISI PRODUK AKTIF --}}
+                    <div class="col-span-full flex flex-col items-center justify-center py-24 text-gray-400">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        <p class="text-sm uppercase tracking-widest font-bold">Koleksi Belum Siap</p>
+                        <p class="text-xs mt-2">Belum ada produk aktif yang dimasukkan ke dalam seri ini oleh admin.</p>
+                    </div>
+                @endforelse
+
+            </div>
+
+            @if(isset($products) && $products->hasPages())
+                <div class="mt-16 border-t border-gray-200 pt-10">
+                    {{ $products->links() }}
+                </div>
+            @endif
+        </div>
+
+    </div>
+</x-layouts.app>

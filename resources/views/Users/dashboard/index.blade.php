@@ -1,8 +1,9 @@
 <x-layouts.app>
     
+    {{-- Banner Utama dengan Teks Berjalan --}}
     <x-hero-banner :displays="$displays" />
 
-    <!-- 1 -->
+    <!-- 1. GRID KATEGORI UTAMA (featured_home) -->
     <section class="max-w-screen-xl mx-auto px-6 pb-20 -mt-24 md:-mt-32 relative z-20">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
@@ -10,12 +11,12 @@
                 <a href="{{ route('category.show', $category->slug) }}" class="relative group cursor-pointer border-4 border-white shadow-xl overflow-hidden bg-gray-100 aspect-[3/4] md:aspect-auto md:h-[400px] block">
                     
                     <img src="{{ asset('storage/' . $category->img) }}" 
-                         onerror="this.src='https://images.unsplash.com/photo-1642886512785-b5fee9faad7f?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'" 
+                         onerror="this.src='https://images.unsplash.com/photo-1642886512785-b5fee9faad7f?q=80&w=764&auto=format&fit=crop'" 
                          class="w-full h-full object-cover group-hover:scale-105 transition duration-700" 
                          alt="{{ $category->name }}">
                     
                     <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-[80%] text-center">
-                        <span class="bg-white px-6 py-2 text-[15px] md:text-[17px] font-bold tracking-widest uppercase shadow-md inline-block w-full">
+                        <span class="bg-white px-6 py-2 text-[15px] md:text-[17px] font-bold tracking-widest uppercase shadow-md inline-block w-full transition-colors group-hover:bg-black group-hover:text-white">
                             {{ $category->name }}
                         </span>
                     </div>
@@ -23,41 +24,50 @@
                     <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition duration-300 z-10"></div>
                 </a>
             @empty
-                <div class="col-span-3 text-center py-10 bg-white shadow-lg text-gray-500">
-                    Kategori belum diatur di Admin Panel.
+                <div class="col-span-3 text-center py-12 bg-white shadow-md text-gray-400 uppercase tracking-widest text-xs font-bold border border-gray-200">
+                    Kategori utama belum diatur di Admin Panel.
                 </div>
             @endforelse
 
         </div>
     </section>
 
-    <!-- 2 -->
-    <section class="w-full pb-24">
-        <div class="relative w-full h-[50vh] md:h-[60vh] bg-black overflow-hidden flex items-center justify-center group">
-            
-            <img src="{{ asset('images/collab-banner.jpg') }}" 
-                 onerror="this.src='https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop'" 
-                 class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700 ease-out" 
-                 alt="Exclusive Collaboration">
-            
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+    <!-- 2. SECTION KAMPANYE KOLABORASI EKSKLUSIF (Hero 2) -->
+    @php
+        // Kebijakan Kontrol Mutlak: Hanya tayang jika data valid dan diaktifkan oleh admin
+        $showCollaboration = isset($displays) && !empty($displays->image_2_path) && !empty($displays->image_2_is_active);
+    @endphp
 
-            <div class="relative z-10 text-center px-4 mt-20 md:mt-0">
-                <p class="text-white text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-3 text-[#c4a052]">
-                    Exclusive Collaboration
-                </p>
-                <h2 class="text-3xl md:text-5xl font-light text-white uppercase tracking-widest mb-8">
-                    Clothique <span class="text-sm mx-2">X</span> The Muse
-                </h2>
-                <a href="{{ route('shop.index') }}" class="inline-block bg-white text-black px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#c4a052] hover:text-white hover:border-[#c4a052] transition-colors duration-300">
-                    Discover The Campaign
-                </a>
+    @if($showCollaboration)
+        <section class="w-full pb-24">
+            <div class="relative w-full h-[60vh] md:h-[75vh] bg-black overflow-hidden flex items-center justify-center group">
+                
+                <img src="{{ asset('storage/' . $displays->image_2_path) }}" 
+                     class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700 ease-out" 
+                     alt="{{ strip_tags($displays->image_2_title ?? 'Exclusive Collaboration') }}">
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+                <div class="relative z-10 text-center px-4 mt-20 md:mt-0">
+                    
+                    <p class="text-white text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-3 text-[#c4a052]">
+                        {{ $displays->image_2_sub_title ?? 'Exclusive Collaboration' }}
+                    </p>
+                    
+                    <h2 class="text-3xl md:text-5xl font-light text-white uppercase tracking-widest mb-8">
+                        {!! $displays->image_2_title ?? 'Clothique <span class="text-sm mx-2">X</span> The Muse' !!}
+                    </h2>
+                    
+                    <a href="{{ $displays->image_2_link ?? route('shop.index') }}" class="inline-block bg-white text-black px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#c4a052] hover:text-white hover:border-[#c4a052] transition-colors duration-300">
+                        Discover The Campaign
+                    </a>
+                    
+                </div>
             </div>
+        </section>
+    @endif
 
-        </div>
-    </section>
-
-    <!-- 3 -->
+    <!-- 3. SECTION BEST SELLERS -->
     <section class="max-w-screen-xl mx-auto px-6 pb-24">
         <div class="flex flex-col items-center mb-12">
             <h2 class="text-3xl font-normal uppercase tracking-widest text-center text-gray-900 mb-4">Best Sellers</h2>
@@ -66,17 +76,17 @@
         
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
             @php
-                // Logika Pembajakan: Ambil dari Bestseller, jika kosong pinjam dari kategori
+                // Jaring Pengaman Memori: Ambil data produk terpilih, batasi maksimal 5 item
                 $displayProducts = (isset($bestsellers) && $bestsellers->count() > 0) 
-                    ? $bestsellers 
-                    : ($categories->firstWhere(fn($cat) => $cat->products->count() > 0)?->products ?? collect());
+                    ? $bestsellers->take(5) 
+                    : ($categories->firstWhere(fn($cat) => $cat->products->count() > 0)?->products->take(5) ?? collect());
             @endphp
 
-            @forelse($displayProducts->take(5) as $product)
+            @forelse($displayProducts as $product)
                 <x-product-card :product="$product" />
             @empty
-                <div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-                    <p>Katalog produk kosong.</p>
+                <div class="col-span-full text-center py-16 text-gray-400 text-xs uppercase tracking-widest font-bold border border-dashed border-gray-200">
+                    Katalog produk bestseller masih kosong.
                 </div>
             @endforelse
         </div>
@@ -88,52 +98,46 @@
         </div>
     </section>
 
-    <!-- 4 -->
-    <section class="w-full h-[60vh] relative flex items-center justify-center overflow-hidden">
-        <img src="{{ asset('images/bottom-promo.jpg') }}" onerror="this.src='https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop'" class="absolute inset-0 w-full h-full object-cover" alt="Promo">
+    <!-- 4. SECTION CUSTOM SHOWCASE COLLECTION (Pilihan Admin) -->
+    @php
+        $hasFeatured = isset($featuredCollection) && $featuredCollection;
+        
+        $bannerUrl = $hasFeatured && $featuredCollection->img 
+            ? asset('storage/' . $featuredCollection->img) 
+            : asset('images/bottom-promo.jpg');
+            
+        $titleText = $hasFeatured ? $featuredCollection->name : 'Custom Collections';
+        
+        $targetUrl = $hasFeatured 
+            ? route('collection.show', $featuredCollection->slug) 
+            : route('shop.index');
+    @endphp
+
+    <section class="w-full h-[50vh] relative flex items-center justify-center overflow-hidden mb-24">
+        <img src="{{ $bannerUrl }}" 
+            onerror="this.src='https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop'" 
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
+            alt="{{ $titleText }}">
+            
         <div class="absolute inset-0 bg-black/40"></div>
+        
         <div class="relative z-10 text-center px-4">
-            <h2 class="text-3xl md:text-5xl font-light text-white uppercase tracking-widest mb-6">
-                Custom Collections
+            <h2 class="text-3xl md:text-5xl font-light text-white uppercase tracking-[0.2em] mb-6">
+                {{ $titleText }}
             </h2>
-            <a href="{{ route('shop.index') }}" class="inline-block bg-transparent border border-white text-white px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300">
-                Explore More
+            
+            <a href="{{ $targetUrl }}" class="inline-block bg-transparent border border-white text-white px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300">
+                {{ $hasFeatured ? 'Explore Collection' : 'Explore More' }}
             </a>
         </div>
     </section>
 
-    <section class="w-full pb-20">
-        <div class="relative w-full h-[50vh] md:h-[70vh] bg-gray-900 overflow-hidden flex items-center justify-center group">
-            
-            <img src="{{ asset('images/banner-be-unique.jpg') }}" 
-                 onerror="this.src='https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop'" 
-                 class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-1000 ease-out" 
-                 alt="Be Unique Be You">
-            
-            <div class="absolute inset-0 bg-black/20"></div>
-
-            <div class="relative z-10 text-center px-4">
-                <h2 class="text-4xl md:text-6xl font-light text-white uppercase tracking-widest mb-4 drop-shadow-lg">
-                    Be Unique, Be You
-                </h2>
-                <p class="text-white text-xs md:text-sm font-medium uppercase tracking-[0.3em] mb-8 drop-shadow-md">
-                    Discover The Collection
-                </p>
-                <a href="{{ route('shop.index') }}" class="inline-block bg-white text-black px-12 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#c4a052] hover:text-white transition-colors duration-300">
-                    See More
-                </a>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 5 -->
+    <!-- 5. GRID SERI / KOLEKSI BAWAH -->
     <section class="max-w-screen-xl mx-auto px-6 pb-24">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             
             @php
-                // Logika Cerdas: Ambil data dari Collections. 
-                // Jika kosong, lompat 3 data pertama dari Categories agar tidak kembar dengan yang di atas.
+                // Logika Hibrida: Gunakan 3 Collection teratas, jika kosong gunakan pecahan sisa kategori
                 $bottomGrids = (isset($collections) && $collections->count() >= 3) 
                     ? $collections->take(3) 
                     : $categories->skip(3)->take(3);
@@ -141,13 +145,18 @@
 
             @forelse($bottomGrids as $gridItem)
                 @php 
+                    $isCollection = isset($collections) && $collections->count() >= 3;
+                    
                     $route = isset($gridItem->slug) 
-                        ? (isset($collections) && $collections->count() >= 3 ? route('collection.show', $gridItem->slug) : route('category.show', $gridItem->slug)) 
-                        : route('shop.index'); 
+                        ? ($isCollection ? route('collection.show', $gridItem->slug) : route('category.show', $gridItem->slug)) 
+                        : route('shop.index');
+                        
+                    // PERBAIKAN ARSITEKTUR KUNCI: Menyelaraskan nama kolom properti gambar ($gridItem->img)
+                    $gridImg = $isCollection ? $gridItem->img : $gridItem->img; 
                 @endphp
 
-                <a href="{{ $route }}" class="relative aspect-[4/5] overflow-hidden group block bg-gray-100">
-                    <img src="{{ asset('storage/' . $gridItem->image) }}" 
+                <a href="{{ $route }}" class="relative aspect-[4/5] overflow-hidden group block bg-gray-100 shadow-sm border border-gray-100">
+                    <img src="{{ $gridImg ? asset('storage/' . $gridImg) : 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop' }}" 
                          onerror="this.src='https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop'" 
                          class="w-full h-full object-cover transition duration-700 group-hover:scale-105" 
                          alt="{{ $gridItem->name }}">
@@ -161,13 +170,15 @@
                     </div>
                 </a>
             @empty
-                <div class="col-span-3 text-center py-10 text-gray-400">Data Koleksi/Kategori tambahan belum tersedia di database.</div>
+                <div class="col-span-3 text-center py-12 text-gray-400 text-xs uppercase tracking-widest font-bold border border-dashed border-gray-200">
+                    Data Koleksi tambahan belum tersedia di database.
+                </div>
             @endforelse
 
         </div>
     </section>
 
-    <!-- 6 -->
+    <!-- 6. SECTION BRAND STORY BRAND (About Us Link) -->
     <section class="w-full">
         <div class="relative w-full h-[50vh] md:h-[60vh] bg-gray-900 overflow-hidden flex flex-col items-center justify-center group">
             

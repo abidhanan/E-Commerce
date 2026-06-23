@@ -4,14 +4,19 @@
         <ul class="space-y-4 mt-4 text-sm text-gray-700 font-medium">
             <li><a href="{{ route('user.orders.index') }}" class="{{ request()->routeIs('user.orders.*') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition">Purchase History</a></li>
             <li><a href="{{ route('wishlist.index') }}" class="{{ request()->routeIs('wishlist.*') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition">Wishlist</a></li>
-            <li><a href="#" class="hover:text-[#c4a052] transition">Posted Reviews</a></li>
+            
+            {{-- PERBAIKAN MUTLAK: Rute diarahkan ke /account dengan membawa hash #reviews --}}
+            <li><a href="{{ url('/account#reviews') }}" id="nav-reviews" class="hover:text-[#c4a052] transition account-nav-link">Posted Reviews</a></li>
         </ul>
     </div>
 
     <div>
         <h3 class="text-lg font-bold uppercase tracking-widest mb-4 border-b-4 border-black inline-block pb-1">Profile Settings</h3>
         <ul class="space-y-4 mt-4 text-sm text-gray-700 font-medium">
-            <li><a href="{{ url('/account') }}" class="{{ request()->is('account') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition">Profile</a></li>
+            
+            {{-- PERBAIKAN MUTLAK: Rute Profile diarahkan membawa hash #profile --}}
+            <li><a href="{{ url('/account#profile') }}" id="nav-profile" class="{{ request()->is('account') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition account-nav-link">Profile</a></li>
+            
             <li><a href="{{ url('/password/reset') }}" class="{{ request()->is('password/reset') ? 'text-black font-bold' : 'hover:text-[#c4a052]' }} transition">Change Password</a></li>
             
             <li class="pt-6 mt-6 border-t border-gray-200">
@@ -31,7 +36,7 @@
             </li>
         </ul>
     </div>
-</aside> 
+</aside>
 
 <div id="logout-modal" class="fixed inset-0 bg-black/60 z-[1000] hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div class="bg-white w-full max-w-sm p-8 shadow-2xl relative transform scale-95 transition-transform duration-300 text-center" id="logout-modal-content">

@@ -24,15 +24,19 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
+        // 1. Pengecekan sesi sudah benar
         if (Auth::check()) {
             return Auth::user()->hasRole('user')
                 ? redirect('/')
                 : redirect('/dashboard');
         }
 
-        $displayLogins = DisplayLogin::orderBy('position')->get();
+        // 2. Kueri Mutlak: HANYA ambil yang aktif, urutkan posisinya, dan beri nama variabel yang selaras dengan antarmuka
+        $banners = DisplayLogin::where('is_active', true)
+                               ->orderBy('position')
+                               ->get();
 
-        return view('auth.login', compact('displayLogins'));
+        return view('auth.login', compact('banners'));
     }
 
         public function login(Request $request)

@@ -39,8 +39,9 @@
                 'admin.consent-documents.*',
             ],
             'children' => [
+                // PERBAIKAN MUTLAK: Mengubah label agar admin tidak tersesat mencari menu Kolaborasi/Kampanye
                 [
-                    'label' => 'Main Displays',
+                    'label' => 'Displays & Collaboration',
                     'icon' => 'bi bi-layout-wtf',
                     'route' => 'admin.displays.index',
                     'active' => ['admin.displays.*'],

@@ -13,19 +13,46 @@
     <div class="flex min-h-screen">
         
         @php
-            $bannerUrl = (isset($displayLogins) && $displayLogins->first()) 
-                ? asset('storage/' . $displayLogins->first()->image_path) 
-                : 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1200&h=1600&fit=crop';
+            // Jaring Pengaman Mutlak: Menangkap variabel dari Controller apa pun namanya
+            $slideData = $banners ?? ($displayLogins ?? collect());
         @endphp
         
-        <div class="hidden lg:block lg:w-1/2 relative bg-black">
-            <img src="{{ $bannerUrl }}" alt="Login Banner" class="absolute inset-0 w-full h-full object-cover opacity-80">
-            <div class="absolute inset-0 bg-black/20"></div>
+        <div class="hidden lg:block lg:w-1/2 relative bg-black overflow-hidden group">
             
-            <div class="absolute bottom-16 left-16 z-10 text-white">
-                <h1 class="text-4xl font-bold tracking-widest uppercase">{{ config('app.name', 'Clothique') }}</h1>
-                <p class="mt-4 text-sm font-light tracking-widest uppercase">Premium Quality Collection</p>
+            <div id="auth-slider-track" class="flex h-full w-full transition-transform duration-1000 ease-in-out">
+                @forelse($slideData as $banner)
+                    <div class="w-full h-full flex-shrink-0 relative">
+                        <img src="{{ asset('storage/' . $banner->image_path) }}" alt="{{ $banner->label }}" class="absolute inset-0 w-full h-full object-cover opacity-80 filter brightness-75">
+                        <div class="absolute inset-0 bg-black/20"></div>
+                        
+                        <div class="absolute bottom-20 left-16 z-10 text-white">
+                            <h1 class="text-4xl font-bold tracking-widest uppercase">{{ config('app.name', 'Clothique') }}</h1>
+                            <p class="mt-4 text-sm font-light tracking-widest uppercase">{{ $banner->label }}</p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="w-full h-full flex-shrink-0 relative">
+                        <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1200&h=1600&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-80 filter brightness-75">
+                        <div class="absolute inset-0 bg-black/20"></div>
+                        
+                        <div class="absolute bottom-20 left-16 z-10 text-white">
+                            <h1 class="text-4xl font-bold tracking-widest uppercase">{{ config('app.name', 'Clothique') }}</h1>
+                            <p class="mt-4 text-sm font-light tracking-widest uppercase">Premium Quality Collection</p>
+                        </div>
+                    </div>
+                @endforelse
             </div>
+
+            @if($slideData->count() > 1)
+                <div class="absolute bottom-10 left-16 flex space-x-2 z-20">
+                    @foreach($slideData as $index => $banner)
+                        <button type="button" 
+                                class="slider-dot w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white w-6' : 'bg-gray-400' }}"
+                                onclick="goToSlide({{ $index }})">
+                        </button>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-[#fafafa]">
@@ -84,6 +111,7 @@
     </div>
 
     <script>
+        // 1. Logika Toggle Password (Bawaanmu)
         function togglePassword() {
             const input = document.getElementById('password-input');
             const icon = document.getElementById('eye-icon');
@@ -96,6 +124,47 @@
                 icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
             }
         }
+
+        // 2. Logika Mesin Slider Banner (Injeksi Baru)
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.getElementById('auth-slider-track');
+            const dots = document.querySelectorAll('.slider-dot');
+            const slideCount = {{ $slideData->count() }};
+            
+            if (slideCount <= 1 || !track) return;
+
+            let currentIndex = 0;
+            let slideInterval;
+
+            window.goToSlide = function(index) {
+                currentIndex = index;
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                dots.forEach((dot, i) => {
+                    if (i === currentIndex) {
+                        dot.classList.replace('bg-gray-400', 'bg-white');
+                        dot.classList.replace('w-2', 'w-6');
+                    } else {
+                        dot.classList.replace('bg-white', 'bg-gray-400');
+                        dot.classList.replace('w-6', 'w-2');
+                    }
+                });
+
+                resetInterval();
+            };
+
+            function nextSlide() {
+                let nextIndex = (currentIndex + 1) % slideCount;
+                goToSlide(nextIndex);
+            }
+
+            function resetInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+
+            resetInterval();
+        });
     </script>
 </body>
 </html>
