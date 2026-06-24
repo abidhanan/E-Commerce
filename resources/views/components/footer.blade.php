@@ -9,11 +9,11 @@
             <div>
                 <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Services</h4>
                 <ul class="space-y-1 text-sm text-gray-400">
-                    <li><a href="#" class="hover:text-white transition">How to Buy</a></li>
-                    <li><a href="#" class="hover:text-white transition">Returns</a></li>
-                    <li><a href="#" class="hover:text-white transition">How to Buy</a></li>
-                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
-                    <li><a href="#" class="hover:text-white transition">Crash Replacement</a></li>
+                    <li><a href="{{ route('how-to-buy') }}">How to Buy</a></li>
+                    <li><a href="{{ route('faq') }}">FAQ</a></li>
+                    <li><a href="{{ route('return-policy') }}">Returns</a></li>
+                    <li><a href="{{ route('crash-replacement') }}">Crash Replacement</a></li>
+                    <li><a href="{{ route('care-guide') }}">Care Guide</a></li>
                     
                 </ul>
             </div>
@@ -21,8 +21,8 @@
             <div>
                 <h4 class="text-sm font-bold uppercase tracking-wider mb-6">Quick Links</h4>
                 <ul class="space-y-1 text-sm text-gray-400">
-                    <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                    <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                    <li><a href="{{ route('about') }}">About</a></li>
+                    <li><a href="{{ route('post') }}">Blogs</a></li>
                 </ul>
             </div>
 
@@ -35,6 +35,21 @@
                 </ul>
             </div>
         </div>
+
+        {{-- @if ($footerMarketplaceLinks->isNotEmpty())
+                <div class="footer-column">
+                    <h3>Official Stores</h3>
+                    <ul class="footer-links">
+                        @foreach ($footerMarketplaceLinks as $link)
+                            <li>
+                                <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer">
+                                    {{ $link->display_label }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif --}}
 
             <div class="md:col-span-2">
                 <h4 class="text-sm justify-self-start w-full max-w-md font-bold uppercase tracking-wider mb-3">Newsletter</h4>
