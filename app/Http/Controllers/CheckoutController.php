@@ -6,11 +6,12 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Notifications\OrderCreatedNotification;
-use Illuminate\Http\JsonResponse;
+use App\Services\DuitkuService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -44,7 +45,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function placeOrder(Request $request): RedirectResponse
+    public function placeOrder(Request $request, DuitkuService $duitkuService): RedirectResponse
     {
         $data = $request->validate([
             'source' => ['required', 'in:cart,direct'],
@@ -135,7 +136,9 @@ class CheckoutController extends Controller
                 'subtotal' => $subtotal,
                 'shipping_cost' => null,
                 'gross_amount' => $subtotal,
-                'status' => 'waiting_admin',
+                'status' => 'pending',
+                'payment_gateway' => 'duitku',
+                'payment_status' => 'invoice_pending',
                 'customer_note' => $data['customer_note'] ?? null,
             ]);
 
@@ -160,81 +163,37 @@ class CheckoutController extends Controller
             report($exception);
         }
 
-        return redirect()
-            ->route('payments.status', $order->order_code)
-            ->with('notify', [
-                'type' => 'success',
-                'title' => 'Pesanan Dibuat',
-                'message' => 'Pesanan berhasil dibuat. Tunggu admin mengonfirmasi ongkir dan link pembayaran.',
+        try {
+            $invoice = $duitkuService->createInvoice($order);
+
+            $order->update([
+                'payment_gateway' => 'duitku',
+                'payment_reference' => $invoice['reference'] ?? null,
+                'payment_method' => $invoice['paymentMethod'] ?? config('duitku.payment_method'),
+                'payment_url' => $invoice['paymentUrl'],
+                'payment_status' => 'pending',
             ]);
-    }
 
-    public function snap(Request $request, int $variantId): JsonResponse
-    {
-        $variant = ProductVariant::query()
-            ->with('product')
-            ->findOrFail($variantId);
+            return redirect()->away($invoice['paymentUrl']);
+        } catch (Throwable $exception) {
+            Log::error('Duitku checkout invoice failed.', [
+                'order_code' => $order->order_code,
+                'message' => $exception->getMessage(),
+            ]);
 
-        if (blank($variant->size) || (int) $variant->stock < 1) {
-            return response()->json([
-                'message' => 'Variant produk belum tersedia.',
-            ], 422);
+            $order->update([
+                'payment_status' => 'invoice_failed',
+            ]);
+
+            return redirect()
+                ->route('payments.status', $order->order_code)
+                ->with('notify', [
+                    'type' => 'error',
+                    'title' => 'Pembayaran Gagal Dibuat',
+                    'message' => 'Invoice pembayaran belum berhasil dibuat. Silakan coba lagi dari halaman status pesanan.',
+                ]);
         }
 
-        $orderCode = $this->generateOrderCode();
-
-        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-        \Midtrans\Config::$clientKey = config('midtrans.clientKey');
-        \Midtrans\Config::$isProduction = (bool) config('midtrans.isProduction');
-        \Midtrans\Config::$isSanitized = (bool) config('midtrans.isSanitized', true);
-        \Midtrans\Config::$is3ds = (bool) config('midtrans.is3ds', true);
-
-        $snapToken = \Midtrans\Snap::getSnapToken([
-            'transaction_details' => [
-                'order_id' => $orderCode,
-                'gross_amount' => (int) $variant->price,
-            ],
-            'item_details' => [
-                [
-                    'id' => $variant->sku ?: (string) $variant->id,
-                    'price' => (int) $variant->price,
-                    'quantity' => 1,
-                    'name' => Str::limit($variant->product->name.' - '.$variant->size, 50, ''),
-                ],
-            ],
-            'customer_details' => [
-                'first_name' => $request->user()->name,
-                'email' => $request->user()->email,
-                'phone' => $request->user()->phone,
-            ],
-        ]);
-
-        $order = DB::transaction(function () use ($request, $variant, $orderCode, $snapToken) {
-            $order = Order::create([
-                'order_code' => $orderCode,
-                'user_id' => $request->user()->id,
-                'subtotal' => $variant->price,
-                'gross_amount' => $variant->price,
-                'status' => 'pending',
-                'snap_token' => $snapToken,
-            ]);
-
-            $order->items()->create([
-                'product_id' => $variant->product_id,
-                'product_variant_id' => $variant->id,
-                'price' => $variant->price,
-                'qty' => 1,
-            ]);
-
-            return $order;
-        });
-
-        return response()->json([
-            'message' => 'Snap token berhasil dibuat.',
-            'snap_token' => $snapToken,
-            'order_code' => $order->order_code,
-            'status_url' => route('payments.status', $order->order_code),
-        ]);
     }
 
     private function addresses(Request $request): Collection

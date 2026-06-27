@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Notifications\OrderPaymentLinkNotification;
 use App\Services\OrderLifecycleService;
 use App\Services\OrderStockService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Throwable;
 
 class OrderController extends Controller
 {
@@ -46,29 +44,19 @@ class OrderController extends Controller
         $data = $request->validate([
             'shipping_cost' => ['required', 'numeric', 'min:0'],
             'gross_amount' => ['required', 'numeric', 'min:0'],
-            'payment_url' => ['nullable', 'url', 'max:2048'],
             'admin_note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $updatedOrder = $stockService->applyStatus($order, 'quoted', [
+        $stockService->applyStatus($order, 'quoted', [
             'shipping_cost' => $data['shipping_cost'],
             'gross_amount' => $data['gross_amount'],
-            'payment_url' => $data['payment_url'] ?? null,
             'admin_note' => $data['admin_note'] ?? null,
             'quoted_at' => now(),
         ]);
 
-        if ($updatedOrder->payment_url && $updatedOrder->user) {
-            try {
-                $updatedOrder->user->notify(new OrderPaymentLinkNotification($updatedOrder));
-            } catch (Throwable $exception) {
-                report($exception);
-            }
-        }
-
         return redirect()
             ->route('admin.orders.show', $order)
-            ->with('success', 'Konfirmasi harga dan link pembayaran berhasil disimpan.');
+            ->with('success', 'Konfirmasi harga berhasil disimpan.');
     }
 
     public function updateStatus(Request $request, Order $order, OrderStockService $stockService)

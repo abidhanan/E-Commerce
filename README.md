@@ -1,20 +1,20 @@
 # Laravel E-Commerce
 
-Aplikasi e-commerce berbasis Laravel yang dapat disesuaikan untuk berbagai jenis toko online. Aplikasi ini mencakup storefront, katalog produk, checkout, manajemen pesanan, pembayaran Midtrans, blog, konten landing page, laporan finance, dan panel admin berbasis role.
+Aplikasi e-commerce berbasis Laravel yang dapat disesuaikan untuk berbagai jenis toko online. Aplikasi ini mencakup storefront, katalog produk, checkout, manajemen pesanan, pembayaran Duitku, blog, konten landing page, laporan finance, dan panel admin berbasis role.
 
 ## Fitur Utama
 
 - Storefront publik: home, shop, detail produk, kategori, collection, search, about, FAQ, care guide, return policy, how to buy, crash replacement, legal document, dan blog.
 - Akun customer: register, login, verifikasi email, reset password, profil, alamat, wishlist, cart, checkout, histori pesanan, review, dan komplain pesanan dengan foto.
 - Checkout: alur order dari cart atau direct checkout, validasi stok varian, alamat pengiriman, catatan customer, dan pembuatan kode order.
-- Pembayaran: integrasi Midtrans Snap dan callback, halaman status pembayaran, verifikasi signature callback, serta dukungan link pembayaran manual setelah admin melakukan quote ongkir.
+- Pembayaran: integrasi Duitku Payment Gateway otomatis, request invoice API, redirect ke payment URL, callback tervalidasi, return URL, dan halaman status pembayaran.
 - Admin catalog: produk, gambar produk, varian, kategori, collections, size guide, temperature, intensities, insulation, breathability, dan materials.
 - Admin content: display landing page, best seller, custom collections, social link, FAQ, about us, how-to-buy step, return step, care guide, crash replacement, consent document, blog category, tag, dan post.
 - Admin order: daftar order, detail order, quote ongkir dan total pembayaran, update status, komplain order, review, dan lifecycle stok.
 - Finance: dashboard revenue, piutang, status transaksi, top product, daftar transaksi, filter, dan export CSV.
 - Akses internal: role `superadmin`, `admin`, `editor`, `finance`, `staff`, dan `user` memakai Spatie Laravel Permission.
 - Audit internal: aktivitas mutasi data admin dicatat melalui middleware `admin.activity`.
-- Keamanan dasar: rate limit auth, email verification, CSRF untuk web form, signature Midtrans callback, dan security headers.
+- Keamanan dasar: rate limit auth, email verification, CSRF untuk web form, signature Duitku callback, dan security headers.
 
 ## Tech Stack
 
@@ -24,7 +24,6 @@ Aplikasi e-commerce berbasis Laravel yang dapat disesuaikan untuk berbagai jenis
 - Vite `^7`
 - Tailwind CSS `^4`
 - Bootstrap 5 dan Bootstrap Icons pada template admin
-- Midtrans PHP SDK
 - Spatie Laravel Permission
 - Jenssegers Agent untuk metadata device/browser pada activity log
 - PHPUnit untuk test
@@ -38,12 +37,12 @@ app/Services             Service lifecycle order dan stok
 app/Notifications        Email verifikasi dan notifikasi order
 config/admin_permissions.php
                          Definisi role dan permission admin
-config/midtrans.php      Konfigurasi key Midtrans
+config/duitku.php        Konfigurasi Duitku Payment Gateway
 database/migrations      Skema database
 database/seeders         Data awal role, user, produk, collection, blog, FAQ, dll
 resources/views          Blade untuk user, auth, email, payment, dan admin
 routes/web.php           Semua route web aplikasi
-tests/Feature            Test fitur checkout, Midtrans, order history, admin finance, dll
+tests/Feature            Test fitur checkout, Duitku, order history, admin finance, dll
 ```
 
 ## Instalasi Lokal
@@ -144,29 +143,40 @@ password123
 
 Dashboard admin dapat diakses melalui `/dashboard` setelah login sebagai role internal.
 
-## Konfigurasi Midtrans
+## Konfigurasi Duitku
 
-Tambahkan key berikut di `.env` saat ingin menjalankan pembayaran Midtrans:
+Tambahkan key berikut di `.env` saat ingin menjalankan pembayaran Duitku:
 
 ```env
-MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxx
-MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxx
-MIDTRANS_IS_PRODUCTION=false
+DUITKU_MERCHANT_CODE=
+DUITKU_API_KEY=
+DUITKU_SANDBOX=true
+DUITKU_CALLBACK_URL="${APP_URL}/payment/callback"
+DUITKU_RETURN_URL="${APP_URL}/payment/return"
+DUITKU_PAYMENT_METHOD=VC
+DUITKU_TIMEOUT=15
 ```
 
-Callback Midtrans diarahkan ke:
+Callback Duitku diarahkan ke:
 
 ```text
-POST /midtrans/callback
+POST /payment/callback
 ```
 
-Untuk development lokal dengan callback dari Midtrans, gunakan tunnel seperti Ngrok dan set `APP_URL` ke URL publik tunnel tersebut.
+Return URL Duitku diarahkan ke:
+
+```text
+GET /payment/return
+```
+
+Untuk development lokal dengan callback dari Duitku, gunakan tunnel seperti Ngrok dan set `APP_URL`, `DUITKU_CALLBACK_URL`, dan `DUITKU_RETURN_URL` ke URL publik tunnel tersebut.
 
 ## Alur Order dan Stok
 
 - Customer membuat order dari cart atau direct checkout.
-- Order awal memakai status `waiting_admin`.
-- Admin mengisi ongkir, total, dan optional payment URL. Status berubah menjadi `quoted`.
+- Order awal checkout memakai status `pending`.
+- Sistem meminta invoice ke Duitku dan menyimpan `payment_reference`, `payment_method`, `payment_url`, dan `payment_status`.
+- Duitku callback menjadi sumber perubahan status pembayaran.
 - Stok dikurangi saat status masuk ke `quoted`, `paid`, `processing`, `shipped`, atau `completed`.
 - Stok dikembalikan saat status kembali ke `waiting_admin`, `pending`, `cancelled`, `failed`, atau `refunded`.
 - Order `shipped` dapat otomatis selesai saat `delivery_estimated_at` sudah lewat ketika halaman status/admin diakses.
@@ -240,7 +250,6 @@ Notifikasi yang tersedia:
 
 - Verifikasi email custom.
 - Email order dibuat.
-- Email link pembayaran setelah admin melakukan quote.
 - Reset password.
 
 Default `.env.example` memakai:
@@ -293,7 +302,11 @@ Pastikan environment production memakai nilai yang sesuai:
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://domain-produksi
-MIDTRANS_IS_PRODUCTION=true
+DUITKU_SANDBOX=false
+DUITKU_MERCHANT_CODE=kode-merchant-produksi
+DUITKU_API_KEY=api-key-produksi
+DUITKU_CALLBACK_URL=https://domain-produksi/payment/callback
+DUITKU_RETURN_URL=https://domain-produksi/payment/return
 ```
 
 ## Catatan Data Awal

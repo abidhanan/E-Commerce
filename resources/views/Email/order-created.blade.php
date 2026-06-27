@@ -21,7 +21,7 @@
                             <h1 style="margin:0; font-size:28px; line-height:1.25;">Pesanan berhasil dibuat</h1>
                             <p style="margin:14px 0 0; font-size:14px; line-height:1.7; color:#444;">
                                 Halo {{ $user->name ?? 'Customer' }}, pesanan {{ $order->order_code }} sudah kami terima.
-                                Admin akan mengecek alamat, ongkir, dan total akhir sebelum mengirim link pembayaran Midtrans.
+                                Silakan lanjutkan proses pembayaran melalui halaman status pesanan.
                             </p>
                         </td>
                     </tr>
@@ -69,7 +69,7 @@
                                 </tr>
                                 <tr>
                                     <td style="padding-top:8px; font-size:14px; color:#555;">Ongkir</td>
-                                    <td align="right" style="padding-top:8px; font-size:14px;">Menunggu admin</td>
+                                    <td align="right" style="padding-top:8px; font-size:14px;">{{ is_null($order->shipping_cost) ? '-' : 'Rp ' . number_format($order->shipping_cost, 0, ',', '.') }}</td>
                                 </tr>
                             </table>
                             <a href="{{ $statusUrl }}" style="display:inline-block; padding:13px 24px; background:#111111; color:#ffffff; text-decoration:none; font-size:13px; font-weight:700;">

@@ -21,7 +21,7 @@ class FinanceController extends Controller
     private const STATUS_LABELS = [
         'waiting_admin' => 'Menunggu Quote',
         'quoted' => 'Menunggu Pembayaran',
-        'pending' => 'Pending Midtrans',
+        'pending' => 'Pending Duitku',
         'challenge' => 'Challenge',
         'paid' => 'Dibayar',
         'processing' => 'Diproses',
@@ -112,6 +112,10 @@ class FinanceController extends Controller
                 'subtotal',
                 'ongkir',
                 'total',
+                'payment_gateway',
+                'payment_reference',
+                'payment_method',
+                'payment_status',
                 'payment_url',
             ]);
 
@@ -129,6 +133,10 @@ class FinanceController extends Controller
                             (float) $order->subtotal,
                             (float) $order->shipping_cost,
                             (float) $order->gross_amount,
+                            $order->payment_gateway,
+                            $order->payment_reference,
+                            $order->payment_method,
+                            $order->payment_status,
                             $order->payment_url,
                         ]);
                     }

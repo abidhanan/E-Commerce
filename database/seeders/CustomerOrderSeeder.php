@@ -62,7 +62,7 @@ class CustomerOrderSeeder extends Seeder
             [
                 'order_code' => 'ORD-DUMMY-0001',
                 'status' => 'paid',
-                'snap_token' => 'dummy-snap-token-0001',
+                'payment_status' => 'success',
                 'items' => [
                     ['sku' => 'ASH-JKT-M', 'qty' => 1],
                     ['sku' => 'TRL-TEE-M', 'qty' => 2],
@@ -71,7 +71,7 @@ class CustomerOrderSeeder extends Seeder
             [
                 'order_code' => 'ORD-DUMMY-0002',
                 'status' => 'pending',
-                'snap_token' => 'dummy-snap-token-0002',
+                'payment_status' => 'pending',
                 'items' => [
                     ['sku' => 'CMT-WDB-S', 'qty' => 1],
                 ],
@@ -79,7 +79,7 @@ class CustomerOrderSeeder extends Seeder
             [
                 'order_code' => 'ORD-DUMMY-0003',
                 'status' => 'failed',
-                'snap_token' => null,
+                'payment_status' => 'failed',
                 'items' => [
                     ['sku' => 'RDG-PNT-32', 'qty' => 1],
                     ['sku' => 'DLY-MRN-M', 'qty' => 1],
@@ -131,10 +131,14 @@ class CustomerOrderSeeder extends Seeder
                     'shipping_cost' => $shippingCost,
                     'gross_amount' => $grossAmount + ($shippingCost ?? 0),
                     'status' => $item['status'],
-                    'snap_token' => $item['snap_token'],
+                    'payment_gateway' => 'duitku',
+                    'payment_reference' => $item['status'] === 'failed' ? null : 'DUITKU-' . $item['order_code'],
+                    'payment_method' => config('duitku.payment_method', 'VC'),
+                    'payment_status' => $item['payment_status'],
                     'payment_url' => $item['status'] === 'failed'
                         ? null
-                        : 'https://app.midtrans.com/payment-links/' . strtolower($item['order_code']),
+                        : 'https://sandbox.duitku.com/checkout/' . strtolower($item['order_code']),
+                    'paid_at' => $item['status'] === 'paid' ? now()->subDays(2) : null,
                     'customer_note' => 'Mohon diproses sesuai alamat terpilih.',
                     'quoted_at' => in_array($item['status'], ['paid', 'pending'], true) ? now()->subDays(2) : null,
                 ],

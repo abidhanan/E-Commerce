@@ -77,7 +77,7 @@
                     <li>`Subtotal` diambil dari nilai produk sebelum ongkir.</li>
                     <li>`Ongkir` muncul jika admin sudah menetapkan biaya kirim pada order manual flow.</li>
                     <li>`Total` adalah `gross_amount`, yaitu nominal akhir yang dibayar customer.</li>
-                    <li>`Payment link` hanya muncul bila admin sudah mengisi link pembayaran custom.</li>
+                    <li>`Payment link` adalah URL pembayaran yang dikembalikan oleh payment gateway.</li>
                     <li>Filter status dan tanggal langsung mempengaruhi hasil export CSV.</li>
                 </ul>
             </div>
@@ -150,7 +150,7 @@
                                     <div class="fw-semibold">{{ $order->order_code }}</div>
                                     @if ($order->payment_url)
                                         <a href="{{ $order->payment_url }}" target="_blank" rel="noopener" class="small text-muted">
-                                            Payment link
+                                            Payment gateway link
                                         </a>
                                     @endif
                                 </td>

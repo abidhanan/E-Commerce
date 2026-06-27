@@ -15,8 +15,8 @@
         ];
 
         $messageMap = [
-            'waiting_admin' => 'Pesanan berhasil dibuat. Admin kami akan segera menghitung ongkos kirim ke alamatmu sebelum menerbitkan tautan pembayaran.',
-            'quoted' => 'Admin telah mengonfirmasi total akhir pesananmu. Silakan gunakan tombol pembayaran di bawah untuk menyelesaikan transaksi.',
+            'waiting_admin' => 'Pesanan berhasil dibuat dan sedang menunggu proses berikutnya.',
+            'quoted' => 'Total akhir pesananmu sudah dikonfirmasi. Silakan gunakan tombol pembayaran di bawah untuk menyelesaikan transaksi.',
             'paid' => 'Pembayaran berhasil diterima. Pesananmu sudah masuk antrean untuk diproses.',
             'pending' => 'Transaksi telah dibuat, tetapi pembayaran belum diselesaikan. Jika kamu baru saja membayar, tunggu beberapa saat dan segarkan halaman ini.',
             'challenge' => 'Transaksi sedang ditinjau oleh penyedia pembayaran. Pantau statusnya secara berkala.',

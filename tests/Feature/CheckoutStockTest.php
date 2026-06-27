@@ -10,6 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Notifications\OrderCreatedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -18,6 +19,13 @@ use Tests\TestCase;
 class CheckoutStockTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
 
     public function test_cart_rejects_quantity_above_variant_stock(): void
     {
@@ -51,9 +59,12 @@ class CheckoutStockTest extends TestCase
             'qty' => 2,
         ]);
 
+        $cartItemId = $user->cartItems()->value('id');
+
         $response = $this->actingAs($user)->post(route('checkout.order'), [
             'address_id' => $address->id,
             'source' => 'cart',
+            'selected_items' => [$cartItemId],
         ]);
 
         $response->assertSessionHasErrors('stock');
@@ -85,14 +96,15 @@ class CheckoutStockTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Review Order')
-            ->assertSee('Ganti Alamat')
+            ->assertSee('Order Summary')
+            ->assertSee('Change')
             ->assertSee('Alpine Shield Jacket');
     }
 
-    public function test_checkout_creates_waiting_admin_order_from_cart_and_sends_email(): void
+    public function test_checkout_creates_pending_duitku_order_from_cart_and_sends_email(): void
     {
         Notification::fake();
+        $this->fakeDuitkuInvoice();
 
         $user = User::factory()->create();
         $address = $user->addresses()->create([
@@ -106,7 +118,7 @@ class CheckoutStockTest extends TestCase
         ]);
         $variant = $this->createVariant(stock: 4);
 
-        $user->cartItems()->create([
+        $cartItem = $user->cartItems()->create([
             'product_variant_id' => $variant->id,
             'qty' => 2,
         ]);
@@ -115,13 +127,16 @@ class CheckoutStockTest extends TestCase
             'address_id' => $address->id,
             'source' => 'cart',
             'customer_note' => 'Tolong cek alamat.',
+            'selected_items' => [$cartItem->id],
         ]);
 
         $order = Order::query()->first();
 
         $this->assertNotNull($order);
-        $response->assertRedirect(route('payments.status', $order->order_code));
-        $this->assertSame('waiting_admin', $order->status);
+        $response->assertRedirect('https://sandbox.duitku.com/checkout/test');
+        $this->assertSame('pending', $order->status);
+        $this->assertSame('duitku', $order->payment_gateway);
+        $this->assertSame('DUITKU-REF-TEST', $order->payment_reference);
         $this->assertSame(200000.0, (float) $order->subtotal);
         $this->assertDatabaseHas('order_items', [
             'order_id' => $order->id,
@@ -162,7 +177,6 @@ class CheckoutStockTest extends TestCase
         $quotePayload = [
             'shipping_cost' => 10000,
             'gross_amount' => 210000,
-            'payment_url' => null,
             'admin_note' => 'OK',
         ];
 
@@ -216,6 +230,26 @@ class CheckoutStockTest extends TestCase
             'size' => 'M',
             'price' => 100000,
             'stock' => $stock,
+        ]);
+    }
+
+    private function fakeDuitkuInvoice(): void
+    {
+        config([
+            'duitku.merchant_code' => 'D1234',
+            'duitku.api_key' => 'test-api-key',
+            'duitku.sandbox' => true,
+            'duitku.payment_method' => 'VC',
+        ]);
+
+        Http::fake([
+            'sandbox.duitku.com/*' => Http::response([
+                'statusCode' => '00',
+                'statusMessage' => 'SUCCESS',
+                'paymentUrl' => 'https://sandbox.duitku.com/checkout/test',
+                'reference' => 'DUITKU-REF-TEST',
+                'paymentMethod' => 'VC',
+            ]),
         ]);
     }
 }

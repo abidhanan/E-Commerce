@@ -18,6 +18,13 @@ class OrderHistoryTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
+
     public function test_guest_is_redirected_from_order_history(): void
     {
         $response = $this->get(route('user.orders.index'));
@@ -31,7 +38,7 @@ class OrderHistoryTest extends TestCase
         $variant = $this->createVariant();
         $order = $this->createOrder($user, $variant, [
             'status' => 'quoted',
-            'payment_url' => 'https://app.midtrans.com/payment-links/test',
+            'payment_url' => 'https://sandbox.duitku.com/checkout/test',
             'quoted_at' => now(),
         ]);
 
@@ -39,7 +46,7 @@ class OrderHistoryTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Riwayat Pembelian')
+            ->assertSee('Purchase History')
             ->assertSee($order->order_code)
             ->assertSee('Menunggu Pembayaran')
             ->assertSee('Bayar');
@@ -112,6 +119,7 @@ class OrderHistoryTest extends TestCase
         $this->assertSame('completed', $order->fresh()->status);
 
         $this->actingAs($user)
+            ->from(route('user.orders.show', $order->order_code))
             ->post(route('user.orders.review', $order->order_code), [
                 'rating' => 5,
                 'comment' => 'Barang sesuai dan nyaman.',
