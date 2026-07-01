@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Http\Requests\PlaceOrderRequest;
+use App\Services\MidtransService;
 use Throwable;
 
 class CheckoutController extends Controller
@@ -44,16 +46,11 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function placeOrder(Request $request): RedirectResponse
+    // PERBAIKAN 1: Parameter Request diganti dengan PlaceOrderRequest
+    public function placeOrder(PlaceOrderRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'source' => ['required', 'in:cart,direct'],
-            'variant_id' => ['required_if:source,direct', 'nullable', 'exists:product_variants,id'],
-            'address_id' => ['required', 'exists:addresses,id'],
-            'customer_note' => ['nullable', 'string', 'max:1000'],
-            'selected_items' => ['required_if:source,cart', 'array'], // KUNCI MUTLAK
-            'selected_items.*' => ['exists:cart_items,id'],
-        ]);
+        // PERBAIKAN 2: Data ditarik dari hasil validasi Form Request, controller bersih!
+        $data = $request->validated();
 
         $address = $request->user()
             ->addresses()
@@ -146,7 +143,6 @@ class CheckoutController extends Controller
                 'qty' => $item['qty'],
             ]));
 
-            // HANYA HAPUS BARANG YANG DIBELI, BUKAN SELURUH KERANJANG
             if ($data['source'] === 'cart') {
                 $request->user()->cartItems()->whereIn('id', $data['selected_items'])->delete();
             }
@@ -169,45 +165,35 @@ class CheckoutController extends Controller
             ]);
     }
 
-    public function snap(Request $request, int $variantId): JsonResponse
+    public function snap(Request $request, int $variantId, MidtransService $midtransService): JsonResponse
     {
-        $variant = ProductVariant::query()
-            ->with('product')
-            ->findOrFail($variantId);
+        $variant = ProductVariant::query()->with('product')->findOrFail($variantId);
 
         if (blank($variant->size) || (int) $variant->stock < 1) {
-            return response()->json([
-                'message' => 'Variant produk belum tersedia.',
-            ], 422);
+            return response()->json(['message' => 'Variant produk belum tersedia.'], 422);
         }
 
         $orderCode = $this->generateOrderCode();
 
-        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-        \Midtrans\Config::$clientKey = config('midtrans.clientKey');
-        \Midtrans\Config::$isProduction = (bool) config('midtrans.isProduction');
-        \Midtrans\Config::$isSanitized = (bool) config('midtrans.isSanitized', true);
-        \Midtrans\Config::$is3ds = (bool) config('midtrans.is3ds', true);
+        $itemDetails = [[
+            'id' => $variant->sku ?: (string) $variant->id,
+            'price' => (int) $variant->price,
+            'quantity' => 1,
+            'name' => \Illuminate\Support\Str::limit($variant->product->name.' - '.$variant->size, 50, ''),
+        ]];
 
-        $snapToken = \Midtrans\Snap::getSnapToken([
-            'transaction_details' => [
-                'order_id' => $orderCode,
-                'gross_amount' => (int) $variant->price,
-            ],
-            'item_details' => [
-                [
-                    'id' => $variant->sku ?: (string) $variant->id,
-                    'price' => (int) $variant->price,
-                    'quantity' => 1,
-                    'name' => Str::limit($variant->product->name.' - '.$variant->size, 50, ''),
-                ],
-            ],
-            'customer_details' => [
-                'first_name' => $request->user()->name,
-                'email' => $request->user()->email,
-                'phone' => $request->user()->phone,
-            ],
-        ]);
+        $customerDetails = [
+            'first_name' => $request->user()->name,
+            'email' => $request->user()->email,
+            'phone' => $request->user()->phone,
+        ];
+
+        $snapToken = $midtransService->createSnapToken(
+            $orderCode, 
+            (int) $variant->price, 
+            $itemDetails, 
+            $customerDetails
+        );
 
         $order = DB::transaction(function () use ($request, $variant, $orderCode, $snapToken) {
             $order = Order::create([
@@ -250,10 +236,11 @@ class CheckoutController extends Controller
     {
         $query = $request->user()
             ->cartItems()
+            // PERBAIKAN 3: Pertahanan melawan data null akibat SoftDeletes
+            ->whereHas('productVariant.product')
             ->with(['productVariant.product.images'])
             ->latest();
 
-        // TANGKAP PARAMETER DARI URL SIDEBAR CART
         if ($request->has('items')) {
             $itemIds = explode(',', $request->input('items'));
             $query->whereIn('id', $itemIds);
@@ -261,7 +248,7 @@ class CheckoutController extends Controller
 
         $items = $query->get()
             ->map(fn (CartItem $item) => [
-                'id' => $item->id, // INI WAJIB ADA AGAR FRONTEND BISA BACA ID-NYA
+                'id' => $item->id, 
                 'product' => $item->productVariant->product,
                 'variant' => $item->productVariant,
                 'qty' => (int) $item->qty,
@@ -300,7 +287,6 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // HANYA TARIK DATA BERDASARKAN CHECKBOX YANG DIPILIH USER
         return $request->user()
             ->cartItems()
             ->whereIn('id', $data['selected_items'])

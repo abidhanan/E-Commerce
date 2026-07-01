@@ -28,19 +28,20 @@ class LandingpageController extends Controller
     public function index()
     {
         $categories = CategoryProduct::query()
-            ->where('is_featured_home', true) // KUNCI MUTLAK: Hanya yang dicentang admin
+            ->where('is_featured_home', true)
             ->with(['products' => fn ($query) => $query
                 ->where('is_active', true)
-                ->with(['images', 'variants'])
+                // EKSEKUSI TINDAKAN 1: Rantai data user ditarik secara eksplisit
+                ->with(['images', 'variants', 'verifiedReviews.user']) 
                 ->latest()
                 ->limit(5)])
-            ->take(3) // Batasi maksimal 3 agar UI tidak rusak
+            ->take(3)
             ->get();
 
         $collections = Collections::query()
             ->with(['products' => fn ($query) => $query
                 ->where('is_active', true)
-                ->with(['images', 'variants'])
+                ->with(['images', 'variants', 'verifiedReviews.user']) 
                 ->latest()
                 ->limit(3)])
             ->withCount(['products as active_products_count' => fn ($query) => $query->where('is_active', true)])
@@ -62,7 +63,7 @@ class LandingpageController extends Controller
             ->with([
                 'products' => fn ($query) => $query
                     ->where('is_active', true)
-                    ->with(['images', 'variants'])
+                    ->with(['images', 'variants', 'verifiedReviews.user']) 
                     ->latest()
                     ->limit(3)
             ])
@@ -77,14 +78,12 @@ class LandingpageController extends Controller
             
         $customCollectionsname = $customCollections->pluck('collection.name')->first() ?? 'Custom Collection';
         
-        // ====================================================================
-        // EKSTRAKSI MUTLAK: Ambil model model Collections pertama dari relasi
-        // ====================================================================
         $featuredCollection = $customCollections->first()?->collection;
 
         $displays = Display::latest()->first();
         
-        $bestsellers = BestSellers::with('product.images', 'product.variants')
+        $bestsellers = BestSellers::with(['product.images', 'product.variants', 'product.verifiedReviews.user'])
+            ->has('product') 
             ->orderBy('position')
             ->get()
             ->pluck('product');
@@ -95,7 +94,6 @@ class LandingpageController extends Controller
             ->take(3)
             ->get();
 
-        // Menyuntikkan 'featuredCollection' ke dalam antarmuka dashboard
         return view('Users.dashboard.index', compact(
             'categories',
             'collections',
@@ -105,14 +103,13 @@ class LandingpageController extends Controller
             'customCollectionsname',
             'bestsellers',
             'newArrivalIds',
-            'featuredCollection', // Pipa data tersambung sempurna ke depan!
+            'featuredCollection',
         ));
     }
     
     public function about()
     {
         $about = Aboutus::query()->first();
-
         return view('Users.about.index', compact('about'));
     }
 
@@ -122,7 +119,6 @@ class LandingpageController extends Controller
             ->where('is_active', true)
             ->orderBy('position')
             ->get();
-
         return view('Users.faq.index', compact('faqs'));
     }
 
@@ -132,7 +128,6 @@ class LandingpageController extends Controller
             ->where('is_active', true)
             ->orderBy('position')
             ->get();
-
         return view('Users.crash-replacement.index', compact('crashReplacements'));
     }
 
@@ -155,7 +150,7 @@ class LandingpageController extends Controller
     public function product(string $product)
     {
         $product = Product::query()
-            ->with(['category', 'collection', 'images', 'variants', 'sizeGuide'])
+            ->with(['category', 'collection', 'images', 'variants', 'sizeGuide', 'verifiedReviews.user'])
             ->where('is_active', true)
             ->where(function ($query) use ($product) {
                 $query->where('slug', $product);
@@ -209,8 +204,9 @@ class LandingpageController extends Controller
             ->take(7)
             ->pluck('id')
             ->toArray();
+            
         $relatedProducts = Product::query()
-            ->with(['images', 'variants'])
+            ->with(['images', 'variants', 'verifiedReviews.user'])
             ->where('is_active', true)
             ->whereKeyNot($product->id)
             ->where(function ($query) use ($product) {
@@ -239,7 +235,7 @@ class LandingpageController extends Controller
     private function searchProducts(string $keyword)
     {
         return Product::query()
-            ->with(['images', 'variants'])
+            ->with(['images', 'variants', 'verifiedReviews.user'])
             ->where('is_active', true)
             ->when($keyword !== '', function ($query) use ($keyword) {
                 $query->where(function ($query) use ($keyword) {
@@ -275,7 +271,6 @@ class LandingpageController extends Controller
         ->get();
 
         $currentStep = 2; 
-
         return view('users.return-policy.index', compact('steps', 'currentStep'));
     }
     
@@ -285,6 +280,7 @@ class LandingpageController extends Controller
         ->where('is_active', true)
         ->orderBy('step_order')
         ->get();
+        
         $currentStep = 1; 
         return view('users.how-to-buy.index', compact('steps', 'currentStep'));
     }
@@ -295,13 +291,12 @@ class LandingpageController extends Controller
             ->where('is_active', true)
             ->orderBy('position')
             ->get();
-
         return view('Users.care-guide.index', compact('guides'));
     }
 
     public function shop(\Illuminate\Http\Request $request)
     {
-        $query = \App\Models\Product::with(['images', 'category', 'variants']);
+        $query = \App\Models\Product::with(['images', 'category', 'variants', 'verifiedReviews.user']);
 
         $keyword = $request->input('search');
         

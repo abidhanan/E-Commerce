@@ -21,25 +21,27 @@ use App\Models\Intensities;
 use App\Models\SizeGuide;
 class ProductController extends Controller
 {
-   public function index(Request $request)
-{
-    $query = Product::with(['category','variants','images']);
+    public function index(Request $request)
+    {
+        $query = Product::with(['category', 'variants', 'images']);
 
-    if ($request->search) {
-        $query->where('name', 'like', "%{$request->search}%");
+        if ($request->search) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+
+        // PERBAIKAN: Ubah dari 2 menjadi 15 atau 20 untuk kenyamanan dashboard admin
+        $products = $query->latest()->paginate(15);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('Admin.Products.partials.table', compact('products'))->render(),
+                'pagination' => $products->links()->render()
+            ]);
+        }
+
+        return view('Admin.Products.index', compact('products'));
     }
-
-    $products = $query->latest()->paginate(2);
-
-    if ($request->ajax()) {
-        return response()->json([
-            'table' => view('Admin.Products.partials.table', compact('products'))->render(),
-            'pagination' => $products->links()->render()
-        ]);
-    }
-
-    return view('Admin.Products.index', compact('products'));
-}
+    
     public function create()
     {
         $sizeGuides = SizeGuide::all();
@@ -75,60 +77,56 @@ class ProductController extends Controller
     ]);
 
     try {
+        DB::transaction(function () use ($request) {
+            $product = Product::create([
+                'category_id' => $request->category_id,
+                'collection_id' => $request->collection_id,
+                'size_guide_id' => $request->size_guide_id,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name) . '-' . time(),
+                'description' => $request->description,
+                'material' => $request->material ?? [],
+                'gender' => $request->gender ?? 'unisex',
+                'weight' => $request->weight ?? 0,
+                'temperature' => $request->temperature ?? 0,
+                'intensity' => $request->intensity ?? 'low',
+                'insulation' => $request->insulation ?? 0,
+                'breathability' => $request->breathability ?? 0,
+                'is_active' => $request->is_active ?? true,
+            ]);
 
-        $product = Product::create([
-            'category_id' => $request->category_id,
-            'collection_id' => $request->collection_id,
-            'size_guide_id' => $request->size_guide_id,
-            'name' => $request->name,
-            'slug' => Str::slug($request->name) . '-' . time(),
-            'description' => $request->description,
-            'material' => $request->material ?? [],
-            'gender' => $request->gender ?? 'unisex',
-            'weight' => $request->weight ?? 0,
-
-            'temperature' => $request->temperature ?? 0,
-            'intensity' => $request->intensity ?? 'low',
-            'insulation' => $request->insulation ?? 0,
-            'breathability' => $request->breathability ?? 0,
-            'is_active' => $request->is_active ?? true,
-        ]);
-
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $key => $image) {
-                $path = $image->store('products', 'public');
-
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image' => $path,
-                    'is_primary' => $key === 0
-                ]);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $key => $image) {
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image' => $image->store('products', 'public'),
+                        'is_primary' => $key === 0
+                    ]);
+                }
             }
-        }
 
-        if ($request->variants) {
-            foreach ($request->variants as $variant) {
-                ProductVariant::create([
-                    'product_id' => $product->id,
-                    'sku' => $variant['sku'],
-                    'color' => $variant['color'] ?? null,
-                    'size' => $variant['size'] ?? null,
-                    'price' => $variant['price'],
-                    'stock' => $variant['stock'] ?? 0,
-                ]);
+            if ($request->variants) {
+                foreach ($request->variants as $variant) {
+                    ProductVariant::create([
+                        'product_id' => $product->id,
+                        'sku' => $variant['sku'],
+                        'color' => $variant['color'] ?? null,
+                        'size' => $variant['size'] ?? null,
+                        'price' => $variant['price'],
+                        'stock' => $variant['stock'] ?? 0,
+                    ]);
+                }
             }
-        }
+        });
 
         return redirect()->route('admin.products.index');
 
     } catch (Throwable $e) {
         report($e);
-
-        return back()
-            ->withInput()
-            ->with('error', 'Produk gagal disimpan. Silakan cek data lalu coba lagi.');
+        return back()->withInput()->with('error', 'Produk gagal disimpan. Kesalahan fatal pada database.');
     }
 }
+
     public function edit(Product $product)
     {
         $sizeGuides = SizeGuide::all();
@@ -253,12 +251,10 @@ public function setHover($id)
 
     public function destroy(Product $product)
     {
+        // HAPUS logika Storage::disk('public')->delete(...) di sini.
+        // Biarkan file fisik tetap ada jika kita hanya melakukan soft delete.
         
-        foreach ($product->images as $image) {
-            Storage::disk('public')->delete($image->image);
-        }
-
-        $product->delete();
+        $product->delete(); // Ini sekarang akan melakukan soft delete otomatis
 
         return back();
     }

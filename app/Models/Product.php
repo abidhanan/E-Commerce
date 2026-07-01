@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use SoftDeletes;
+    
     protected $fillable = [
         'category_id', 'collection_id', 'size_guide_id', 'name', 'slug', 'description',
         'material', 'gender', 'weight', 'is_active',
@@ -21,12 +24,14 @@ class Product extends Model
     {
         return $this->belongsTo(Collections::class, 'collection_id');
     }
+    
     public function customCollections()
     {
         return $this->belongsToMany(Collections::class, 'custom_collections_displays', 'product_id', 'collection_id')
             ->withPivot('position')
             ->withTimestamps();
     }
+    
     public function images()
     {
         return $this->hasMany(ProductImage::class);
@@ -49,31 +54,28 @@ class Product extends Model
     }
 
     protected $casts = [
-        'material' => 'array', // tetap pakai ini
+        'material' => 'array',
     ];
 
-    // ACCESSOR (ambil data)
+    // ACCESSOR (ambil data material)
     public function getMaterialAttribute($value)
     {
         if (is_null($value)) {
             return [];
         }
 
-        // kalau sudah array (JSON)
         if (is_array($value)) {
             return $value;
         }
 
-        // kalau string JSON "[1,2]"
         if ($this->isJson($value)) {
             return json_decode($value, true) ?? [];
         }
 
-        // fallback string biasa "1"
         return [$value];
     }
 
-    // MUTATOR (simpan data)
+    // MUTATOR (simpan data material)
     public function setMaterialAttribute($value)
     {
         if (is_array($value)) {
@@ -83,22 +85,19 @@ class Product extends Model
         }
     }
 
-    // helper
+    // Helper validasi JSON
     private function isJson($string)
     {
         json_decode($string);
-
         return json_last_error() === JSON_ERROR_NONE;
     }
 
-    // ACCESSOR: Menarik ulasan terverifikasi dari OrderReview melalui OrderItem
-    public function getVerifiedReviewsAttribute()
+    /**
+     * Relasi langsung ke ulasan. 
+     * Eksekusi kueri yang jauh lebih ringan dan anti N+1 saat di-eager load.
+     */
+    public function verifiedReviews()
     {
-        return \App\Models\OrderReview::with('user')
-            ->whereHas('order.items', function ($query) {
-                $query->where('product_id', $this->id);
-            })
-            ->latest()
-            ->get();
+        return $this->hasMany(OrderReview::class, 'product_id')->latest();
     }
 }

@@ -114,7 +114,6 @@
                 </form>
                 
                 @php
-                    // Proteksi Radar: Membaca status di database server secara real-time
                     $inWishlist = auth()->check() && \Illuminate\Support\Facades\DB::table('wishlists')
                         ->where('user_id', auth()->id())
                         ->where('product_id', $product->id)
@@ -144,7 +143,8 @@
                     <h3 class="text-sm font-bold uppercase tracking-widest mb-6">Verified Ratings</h3>
                     
                     @php
-                        $reviews = $product->verified_reviews ?? collect();
+                        // PERBAIKAN FATAL: Memanggil relasi verifiedReviews (camelCase), bukan accessor
+                        $reviews = $product->verifiedReviews ?? collect();
                         $averageRating = $reviews->count() > 0 ? round($reviews->avg('rating'), 1) : 0;
                     @endphp
 
@@ -169,7 +169,8 @@
                             <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h4 class="text-sm font-bold text-gray-900">{{ $review->user->name ?? 'Verified Buyer' }}</h4>
+                                        {{-- PERBAIKAN FATAL: Nullsafe operator (?->) untuk mencegah Error 500 jika user terhapus --}}
+                                        <h4 class="text-sm font-bold text-gray-900">{{ $review->user?->name ?? 'Verified Buyer' }}</h4>
                                         <span class="bg-green-100 text-green-800 text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-sm">Verified</span>
                                     </div>
                                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{{ $review->created_at->format('d M Y') }}</p>
@@ -303,14 +304,12 @@
             
             if (wishlistForm) {
                 wishlistForm.addEventListener('submit', async function(e) {
-                    // Mencegat reload halaman standar HTML
                     e.preventDefault();
 
                     const btn = document.getElementById('wishlist-btn');
                     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                     const url = this.action;
 
-                    // Kunci tombol saat transaksi berlangsung demi mencegah spam click
                     btn.disabled = true;
                     const originalText = btn.innerText;
                     btn.innerText = 'PROCESSING...';
@@ -325,7 +324,6 @@
                             }
                         });
 
-                        // Gerbang Keamanan Otentikasi: Jika session mati di tengah jalan
                         if (response.status === 401) {
                             window.location.href = "{{ route('login') }}";
                             return;
@@ -340,7 +338,6 @@
                             return;
                         }
 
-                        // MUTASI VISUAL: Merestrukturisasi Tailwind CSS secara instan tanpa reload
                         if (data.status === 'added') {
                             btn.className = "w-full border border-black text-[10px] font-bold tracking-widest uppercase py-4 transition bg-black text-white hover:bg-gray-800";
                             btn.innerText = 'Remove from Wishlist';
@@ -359,7 +356,6 @@
                 });
             }
 
-            // Otomasi Seleksi Ukuran Berdasarkan URL (Dari halaman Cart)
             const urlParams = new URLSearchParams(window.location.search);
             const targetSize = urlParams.get('size');
             if (targetSize) {

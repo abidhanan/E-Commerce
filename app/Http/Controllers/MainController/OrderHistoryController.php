@@ -57,17 +57,18 @@ class OrderHistoryController extends Controller
             ->with('success', 'Pesanan ditandai selesai. Kamu bisa memberi rating atau mengirim komplain jika ada masalah.');
     }
 
-    public function storeReview(\Illuminate\Http\Request $request, string $orderCode)
+    public function storeReview(Request $request, string $orderCode)
     {
-        // 1. Validasi Input Dasar
-        $request->validate([
+        // 1. Validasi Input Mutlak (Zero-Trust)
+        $data = $request->validate([
+            'product_id' => ['required', 'exists:products,id'], // WAJIB ADA & HARUS VALID
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'comment' => ['required', 'string', 'max:1000'],
         ]);
 
-        // 2. Cari pesanan berdasarkan order_code dan pastikan itu milik user yang sedang login
-        $order = \App\Models\Order::where('order_code', $orderCode)
-            ->where('user_id', auth()->id())
+        // 2. Cari pesanan beserta itemnya
+        $order = Order::with('items')->where('order_code', $orderCode)
+            ->where('user_id', $request->user()->id)
             ->firstOrFail();
 
         // 3. Pertahanan Logika 1: Hanya pesanan selesai yang boleh diulas
@@ -79,24 +80,38 @@ class OrderHistoryController extends Controller
             ]);
         }
 
-        // 4. Pertahanan Logika 2: Mencegah ulasan ganda
-        if ($order->review()->exists()) {
+        // 4. Pertahanan Logika 2: Pastikan produk benar-benar dibeli di pesanan ini (Anti-Hacking)
+        $isProductInOrder = $order->items->contains('product_id', $data['product_id']);
+        if (!$isProductInOrder) {
             return back()->with('notify', [
                 'type' => 'error',
-                'title' => 'Ditolak',
-                'message' => 'Pesanan ini sudah memiliki ulasan.'
+                'title' => 'Manipulasi Terdeteksi',
+                'message' => 'Anda tidak bisa mengulas produk yang tidak ada dalam pesanan ini.'
             ]);
         }
 
-        // 5. Eksekusi Penyimpanan
-        \App\Models\OrderReview::create([
+        // 5. Pertahanan Logika 3: Mencegah ulasan ganda untuk produk spesifik ini
+        $hasReviewed = OrderReview::where('order_id', $order->id)
+                            ->where('product_id', $data['product_id'])
+                            ->exists();
+
+        if ($hasReviewed) {
+            return back()->with('notify', [
+                'type' => 'error',
+                'title' => 'Ditolak',
+                'message' => 'Anda sudah memberikan ulasan untuk produk ini.'
+            ]);
+        }
+
+        // 6. Eksekusi Penyimpanan yang Aman
+        OrderReview::create([
             'order_id' => $order->id,
-            'user_id' => auth()->id(),
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'product_id' => $data['product_id'],
+            'user_id' => $request->user()->id,
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
         ]);
 
-        // 6. Kembalikan pengguna dengan notifikasi sukses
         return back()->with('notify', [
             'type' => 'success',
             'title' => 'Ulasan Berhasil',

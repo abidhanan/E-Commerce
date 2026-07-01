@@ -58,7 +58,7 @@
                         {!! $displays->image_2_title ?? 'Clothique <span class="text-sm mx-2">X</span> The Muse' !!}
                     </h2>
                     
-                    <a href="{{ $displays->image_2_link ?? route('shop.index') }}" class="inline-block bg-white text-black px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#c4a052] hover:text-white hover:border-[#c4a052] transition-colors duration-300">
+                    <a href="{{ !empty($displays->image_2_link) ? $displays->image_2_link : route('shop.index') }}" class="inline-block bg-white text-black px-10 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#c4a052] hover:text-white hover:border-[#c4a052] transition-colors duration-300">
                         Discover The Campaign
                     </a>
                     
@@ -116,7 +116,7 @@
     <section class="w-full h-[50vh] relative flex items-center justify-center overflow-hidden mb-24">
         <img src="{{ $bannerUrl }}" 
             onerror="this.src='https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop'" 
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105"
             alt="{{ $titleText }}">
             
         <div class="absolute inset-0 bg-black/40"></div>
