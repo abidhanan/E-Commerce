@@ -87,9 +87,10 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware('signed')
     ->name('verification.verify');
 
-Route::post('/midtrans/callback', [PaymentController::class, 'callback'])
+Route::post('/payment/callback', [PaymentController::class, 'callback'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
-    ->name('midtrans.callback');
+    ->name('payment.callback');
+Route::get('/payment/return', [PaymentController::class, 'returnView'])->name('payment.return');
 
 Route::middleware('auth')->group(function () {
 
@@ -118,6 +119,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{orderCode}/complaints', [OrderHistoryController::class, 'storeComplaint'])->name('user.orders.complaints.store');
     Route::get('/orders/{orderCode}', [OrderHistoryController::class, 'show'])->name('user.orders.show');
     Route::get('/payments/{orderCode}/status', [PaymentController::class, 'status'])->name('payments.status');
+    Route::post('/payments/{orderCode}/retry', [PaymentController::class, 'retry'])->name('payments.retry');
 });
 
 /*
@@ -132,8 +134,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:superadmin|admin|editor|finance|staff')
         ->name('dashboard');
     Route::get('/payment-tester', [PaymentTesterController::class, 'index'])->name('payments.tester');
-
-    Route::post('/checkout/{variantId}/snap', [CheckoutController::class, 'snap'])->name('checkout.snap');
 
     Route::prefix('address')->controller(AccountController::class)->group(function () {
         Route::get('/{id}', 'show');

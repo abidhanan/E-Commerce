@@ -15,8 +15,13 @@ class Order extends Model
         'gross_amount',
         'status',
         'stock_deducted_at',
-        'snap_token',
+        'payment_gateway',
+        'payment_reference',
+        'payment_method',
         'payment_url',
+        'payment_status',
+        'paid_at',
+        'callback_payload',
         'customer_note',
         'admin_note',
         'quoted_at',
@@ -55,9 +60,11 @@ class Order extends Model
         return [
             'quoted_at' => 'datetime',
             'stock_deducted_at' => 'datetime',
+            'paid_at' => 'datetime',
             'shipped_at' => 'datetime',
             'delivery_estimated_at' => 'datetime',
             'completed_at' => 'datetime',
+            'callback_payload' => 'array',
         ];
     }
 }

@@ -157,13 +157,6 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Link Payment Midtrans Custom</label>
-                                <input type="url" name="payment_url" class="form-control"
-                                    value="{{ old('payment_url', $order->payment_url) }}"
-                                    placeholder="https://app.midtrans.com/payment-links/...">
-                            </div>
-
-                            <div class="mb-3">
                                 <label class="form-label">Catatan Admin</label>
                                 <textarea name="admin_note" class="form-control" rows="4">{{ old('admin_note', $order->admin_note) }}</textarea>
                             </div>

@@ -6,11 +6,12 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Notifications\OrderCreatedNotification;
-use Illuminate\Http\JsonResponse;
+use App\Services\DuitkuService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -132,7 +133,9 @@ class CheckoutController extends Controller
                 'subtotal' => $subtotal,
                 'shipping_cost' => null,
                 'gross_amount' => $subtotal,
-                'status' => 'waiting_admin',
+                'status' => 'pending',
+                'payment_gateway' => 'duitku',
+                'payment_status' => 'invoice_pending',
                 'customer_note' => $data['customer_note'] ?? null,
             ]);
 
@@ -156,14 +159,16 @@ class CheckoutController extends Controller
             report($exception);
         }
 
-        return redirect()
-            ->route('payments.status', $order->order_code)
-            ->with('notify', [
-                'type' => 'success',
-                'title' => 'Pesanan Dibuat',
-                'message' => 'Pesanan berhasil dibuat. Tunggu admin mengonfirmasi ongkir dan link pembayaran.',
+        try {
+            $invoice = $duitkuService->createInvoice($order);
+
+            $order->update([
+                'payment_gateway' => 'duitku',
+                'payment_reference' => $invoice['reference'] ?? null,
+                'payment_method' => $invoice['paymentMethod'] ?? config('duitku.payment_method'),
+                'payment_url' => $invoice['paymentUrl'],
+                'payment_status' => 'pending',
             ]);
-    }
 
     public function snap(Request $request, int $variantId, MidtransService $midtransService): JsonResponse
     {
